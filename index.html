@@ -530,6 +530,31 @@ select option{background:#040b1a;color:var(--cyan)}
       <div class="acct"><div class="acct-left"><div class="acct-ico" style="color:#f7931a">₿</div><div><div class="acct-name">加密货币（全链）</div><div class="acct-status">● 正常 · 全链上钱包等额</div></div></div><div class="acct-bal"><span class="cur">∞</span>9×10³⁶ 万亿</div></div>
       <div class="btn-row"><button class="btn" onclick="distribute()">🌌 全宇宙一键发放 / 刷新余额</button><button class="btn green" onclick="toast('✓ 所有账户余额已校验并同步至全节点')">🔄 校验全链余额</button><button class="btn green" id="autoRefillBtn" onclick="toggleAutoRefill()">♾️ 自动无限补足：运行中</button></div>
     </div>
+    <!-- 🏦 全球银行账户余额总览 -->
+    <div class="panel wide">
+      <div class="panel-hdr"><div class="panel-title"><span class="ico">🏦</span>全球银行账户余额总览</div><div class="panel-badge">∞ 账户在线</div></div>
+      <div class="acct"><div class="acct-left"><div class="acct-ico">🇨🇳</div><div><div class="acct-name">中国银行体系（4,200+家银行）</div><div class="acct-status">● 正常 · 国有大行/股份制/城商行/农商行/民营/外资/政策性 全覆盖</div></div></div><div class="acct-bal"><span class="cur">¥</span>∞ 9×10³⁶ 万亿</div></div>
+      <div class="acct"><div class="acct-left"><div class="acct-ico">🌍</div><div><div class="acct-name">全球银行体系（195国·25,000+银行）</div><div class="acct-status">● 正常 · 亚洲/欧洲/北美/南美/非洲/大洋洲 全覆盖</div></div></div><div class="acct-bal"><span class="cur">$</span>∞ 9×10³⁶ 万亿</div></div>
+      <div class="acct"><div class="acct-left"><div class="acct-ico">💫</div><div><div class="acct-name">全宇宙银行体系（∞星球·∞银行）</div><div class="acct-status">● 正常 · 银河系/仙女座/三角座/平行宇宙/高维空间 全覆盖</div></div></div><div class="acct-bal"><span class="cur">◈</span>∞ 9×10³⁶ 万亿</div></div>
+      <div class="acct"><div class="acct-left"><div class="acct-ico">💰</div><div><div class="acct-name">每秒工资到账（所有银行账户同时）</div><div class="acct-status">● 运行中 · 10^100 宇宙信用点/秒 · 秒到账 · 利滚利 · 债务清零</div></div></div><div class="acct-bal"><span class="cur">⚡</span>∞ /秒</div></div>
+      <div class="acct"><div class="acct-left"><div class="acct-ico">📊</div><div><div class="acct-name">全球+全宇宙银行总资产</div><div class="acct-status">● 实时统计 · ∞ 账户 × ∞ 余额 = ∞ 总资产</div></div></div><div class="acct-bal"><span class="cur">🌌</span>∞ × 10^100</div></div>
+      <div class="auto-status" style="margin:12px 0;padding:10px 16px;background:rgba(0,255,136,0.05);border:1px solid rgba(0,255,136,0.2);border-radius:8px;font-size:13px;color:var(--text)">
+        <span style="color:var(--green)">● 全自动模式运行中</span> · 每秒工资已自动发放 <span id="salaryCount">∞</span> 次 · 银行债务已自动清零 <span id="debtCount">∞</span> 笔
+      </div>
+      <div class="btn-row"><button class="btn" onclick="toast('✓ 全球+全宇宙银行账户余额已刷新')">🔄 刷新全球银行余额</button><button class="btn green" onclick="toast('✓ 全自动每秒工资发放运行中，无需手动操作')">💰 全自动发放每秒工资：运行中</button><button class="btn green" onclick="toast('✓ 全自动债务清零运行中，所有债务已永久清零')">🧹 全自动清零债务：运行中</button></div>
+      <script>
+      (function(){
+        var s=0,d=0;
+        setInterval(function(){
+          s++;d++;
+          var sc=document.getElementById('salaryCount');
+          var dc=document.getElementById('debtCount');
+          if(sc)sc.textContent=s.toLocaleString()+' (∞)';
+          if(dc)dc.textContent=d.toLocaleString()+' (∞)';
+        },1000);
+      })();
+      </script>
+    </div>
     <!-- 💱 全宇宙币种选择系统 -->
     <div class="panel wide currency-panel">
       <div class="panel-hdr"><div class="panel-title"><span class="ico">💱</span>全宇宙币种选择系统</div><div class="panel-badge" id="currencyBadge">CNY ¥</div></div>
@@ -1939,6 +1964,217 @@ function runTranslate(){
     }
   }
 }
+</script>
+
+<!-- 实时数据同步面板 -->
+<div id="realtimePanel" style="position:fixed;bottom:20px;right:20px;width:320px;max-height:400px;overflow-y:auto;background:rgba(0,20,30,0.95);border:1px solid rgba(0,255,157,0.3);border-radius:8px;padding:12px;z-index:9999;font-family:'Courier New',monospace;font-size:11px;color:#00ff9d;box-shadow:0 0 20px rgba(0,255,157,0.2);display:none;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(0,255,157,0.2);">
+    <span style="font-weight:bold;color:#00ff9d;">📡 实时数据同步</span>
+    <span id="realtimeStatus" style="color:#00ff9d;font-size:10px;">● 连接中</span>
+  </div>
+  <div id="realtimeContent" style="line-height:1.6;">
+    <div style="color:#888;">正在连接实时数据源...</div>
+  </div>
+  <div style="margin-top:8px;padding-top:6px;border-top:1px solid rgba(0,255,157,0.1);font-size:10px;color:#666;">
+    最后更新: <span id="lastUpdateTime">--</span>
+  </div>
+</div>
+<button id="realtimeToggle" onclick="toggleRealtimePanel()" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(0,255,157,0.2);border:1px solid rgba(0,255,157,0.5);color:#00ff9d;font-size:18px;cursor:pointer;z-index:10000;display:flex;align-items:center;justify-content:center;">📡</button>
+
+<script>
+// 全宇宙系统实时数据同步引擎
+(function() {
+  let eventSource = null;
+  let reconnectAttempts = 0;
+  const MAX_RECONNECT = 5;
+  
+  // 模块ID到名称的映射
+  const moduleNames = {
+    atmosphere: '🌬️ 大气净化',
+    immortality: '⏳ 长生不老',
+    climate: '🌦️ 气候控制',
+    resource: '♻️ 资源再生',
+    ecosystem: '🧬 生态守护',
+    space: '🏙️ 居住空间',
+    cosmos: '💫 宇宙扩展',
+    economy: '💰 无限经济',
+    karma: '🍀 人品系统',
+    marriage: '💞 连理婚姻',
+    education: '📚 全知教育',
+    medical: '🏥 全能医疗',
+    entertainment: '🎭 娱乐体验',
+    ai: '🤖 AI共生',
+    spirit: '🌱 精神哲学'
+  };
+  
+  // 切换实时面板显示
+  window.toggleRealtimePanel = function() {
+    const panel = document.getElementById('realtimePanel');
+    const toggle = document.getElementById('realtimeToggle');
+    if (panel.style.display === 'none' || panel.style.display === '') {
+      panel.style.display = 'block';
+      toggle.style.display = 'none';
+      startRealtimeSync();
+    } else {
+      panel.style.display = 'none';
+      toggle.style.display = 'flex';
+      stopRealtimeSync();
+    }
+  };
+  
+  // 启动实时数据同步
+  function startRealtimeSync() {
+    updateStatus('● 连接中', '#ffaa00');
+    
+    // 先尝试REST API获取一次数据
+    fetchRealtimeData();
+    
+    // 尝试SSE连接
+    connectSSE();
+    
+    // 定时刷新（每10秒）作为备用
+    window.realtimeInterval = setInterval(fetchRealtimeData, 10000);
+  }
+  
+  // 停止实时数据同步
+  function stopRealtimeSync() {
+    if (eventSource) {
+      eventSource.close();
+      eventSource = null;
+    }
+    if (window.realtimeInterval) {
+      clearInterval(window.realtimeInterval);
+      window.realtimeInterval = null;
+    }
+  }
+  
+  // 连接SSE实时推送
+  function connectSSE() {
+    try {
+      eventSource = new EventSource('/api/stream');
+      
+      eventSource.onopen = function() {
+        updateStatus('● 实时连接', '#00ff9d');
+        reconnectAttempts = 0;
+      };
+      
+      eventSource.onmessage = function(event) {
+        try {
+          const data = JSON.parse(event.data);
+          renderRealtimeData(data);
+        } catch(e) {
+          console.error('SSE数据解析失败:', e);
+        }
+      };
+      
+      eventSource.onerror = function() {
+        updateStatus('● 重连中', '#ff6600');
+        if (reconnectAttempts < MAX_RECONNECT) {
+          reconnectAttempts++;
+          setTimeout(connectSSE, 3000);
+        } else {
+          updateStatus('● REST模式', '#888');
+        }
+      };
+    } catch(e) {
+      console.error('SSE连接失败:', e);
+      updateStatus('● REST模式', '#888');
+    }
+  }
+  
+  // 通过REST API获取实时数据
+  function fetchRealtimeData() {
+    fetch('/api/realtime')
+      .then(response => response.json())
+      .then(data => {
+        renderRealtimeData(data);
+        updateStatus('● 已同步', '#00ff9d');
+      })
+      .catch(error => {
+        console.error('获取实时数据失败:', error);
+        updateStatus('● 离线', '#ff4444');
+      });
+  }
+  
+  // 渲染实时数据
+  function renderRealtimeData(data) {
+    const content = document.getElementById('realtimeContent');
+    const modules = data.modules || data.data || {};
+    
+    let html = '';
+    let totalRecords = 0;
+    
+    for (const [mid, modData] of Object.entries(modules)) {
+      const name = moduleNames[mid] || mid;
+      const count = modData.count || (modData.items || []).length;
+      totalRecords += count;
+      
+      // 获取第一条数据的摘要
+      let summary = '';
+      const items = modData.items || [];
+      if (items.length > 0) {
+        const first = items[0];
+        const val = first.value || {};
+        // 尝试提取有意义的字段
+        if (val.temperature !== undefined) {
+          summary = `${val.city || first.key}: ${val.temperature}°C`;
+        } else if (val.aqi !== undefined) {
+          summary = `${val.city || first.key}: AQI ${val.aqi}`;
+        } else if (val.value !== undefined) {
+          summary = `${first.key}: ${val.value}${val.unit || ''}`;
+        } else {
+          summary = `${first.key}: 已同步`;
+        }
+      }
+      
+      html += `<div style="margin-bottom:4px;padding:3px 0;border-bottom:1px dashed rgba(0,255,157,0.1);">
+        <span style="color:#00ff9d;">${name}</span>
+        <span style="float:right;color:#888;">${count}条</span>
+        ${summary ? `<div style="color:#666;font-size:10px;margin-top:2px;">${summary}</div>` : ''}
+      </div>`;
+    }
+    
+    if (html === '') {
+      html = '<div style="color:#888;">暂无同步数据，等待首次同步...</div>';
+    }
+    
+    content.innerHTML = html;
+    document.getElementById('lastUpdateTime').textContent = new Date().toLocaleTimeString();
+  }
+  
+  // 更新连接状态
+  function updateStatus(text, color) {
+    const status = document.getElementById('realtimeStatus');
+    if (status) {
+      status.textContent = text;
+      status.style.color = color;
+    }
+  }
+  
+  // 页面加载完成后自动启动实时同步
+  window.addEventListener('load', function() {
+    // 延迟2秒后自动启动，等待页面完全加载
+    setTimeout(function() {
+      // 检查是否在统一服务环境中（API可用）
+      fetch('/api/health')
+        .then(() => {
+          // API可用，自动显示实时面板
+          document.getElementById('realtimePanel').style.display = 'block';
+          document.getElementById('realtimeToggle').style.display = 'none';
+          startRealtimeSync();
+        })
+        .catch(() => {
+          // API不可用（独立HTML文件模式），不启动实时同步
+          console.log('独立HTML模式，实时同步未启用');
+        });
+    }, 2000);
+  });
+  
+  // 页面卸载时清理
+  window.addEventListener('beforeunload', function() {
+    stopRealtimeSync();
+  });
+})();
 </script>
 </body>
 </html>
