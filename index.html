@@ -1982,199 +1982,278 @@ function runTranslate(){
 <button id="realtimeToggle" onclick="toggleRealtimePanel()" style="position:fixed;bottom:20px;right:20px;width:40px;height:40px;border-radius:50%;background:rgba(0,255,157,0.2);border:1px solid rgba(0,255,157,0.5);color:#00ff9d;font-size:18px;cursor:pointer;z-index:10000;display:flex;align-items:center;justify-content:center;">📡</button>
 
 <script>
-// 全宇宙系统实时数据同步引擎
+<!-- 全宇宙系统 - 前端实时数据同步引擎（直接调用公开API，无需后端） -->
+<script>
 (function() {
-  let eventSource = null;
-  let reconnectAttempts = 0;
-  const MAX_RECONNECT = 5;
+  'use strict';
   
-  // 模块ID到名称的映射
-  const moduleNames = {
-    atmosphere: '🌬️ 大气净化',
-    immortality: '⏳ 长生不老',
-    climate: '🌦️ 气候控制',
-    resource: '♻️ 资源再生',
-    ecosystem: '🧬 生态守护',
-    space: '🏙️ 居住空间',
-    cosmos: '💫 宇宙扩展',
-    economy: '💰 无限经济',
-    karma: '🍀 人品系统',
-    marriage: '💞 连理婚姻',
-    education: '📚 全知教育',
-    medical: '🏥 全能医疗',
-    entertainment: '🎭 娱乐体验',
-    ai: '🤖 AI共生',
-    spirit: '🌱 精神哲学'
+  // 全球主要城市坐标
+  const CITIES = [
+    { name: '北京', lat: 39.9042, lon: 116.4074 },
+    { name: '上海', lat: 31.2304, lon: 121.4737 },
+    { name: '东京', lat: 35.6762, lon: 139.6503 },
+    { name: '伦敦', lat: 51.5074, lon: -0.1278 },
+    { name: '纽约', lat: 40.7128, lon: -74.0060 },
+    { name: '巴黎', lat: 48.8566, lon: 2.3522 },
+    { name: '悉尼', lat: -33.8688, lon: 151.2093 },
+    { name: '迪拜', lat: 25.2048, lon: 55.2708 }
+  ];
+  
+  // 模块配置
+  const MODULES = {
+    atmosphere: { name: '大气净化', icon: '🌬️' },
+    immortality: { name: '长生不老', icon: '⏳' },
+    climate: { name: '气候控制', icon: '🌦️' },
+    resource: { name: '资源再生', icon: '♻️' },
+    ecosystem: { name: '生态守护', icon: '🧬' },
+    space: { name: '居住空间', icon: '🏙️' },
+    cosmos: { name: '宇宙扩展', icon: '💫' },
+    economy: { name: '无限经济', icon: '💰' },
+    karma: { name: '人品系统', icon: '🍀' },
+    marriage: { name: '连理婚姻', icon: '💞' },
+    education: { name: '全知教育', icon: '📚' },
+    medical: { name: '全能医疗', icon: '🏥' },
+    entertainment: { name: '娱乐体验', icon: '🎭' },
+    ai: { name: 'AI共生', icon: '🤖' },
+    spirit: { name: '精神哲学', icon: '🌱' }
   };
   
-  // 切换实时面板显示
-  window.toggleRealtimePanel = function() {
-    const panel = document.getElementById('realtimePanel');
-    const toggle = document.getElementById('realtimeToggle');
-    if (panel.style.display === 'none' || panel.style.display === '') {
-      panel.style.display = 'block';
-      toggle.style.display = 'none';
-      startRealtimeSync();
-    } else {
-      panel.style.display = 'none';
-      toggle.style.display = 'flex';
-      stopRealtimeSync();
+  // 天气代码转描述
+  function getWeatherDescription(code) {
+    const codes = {
+      0: '晴', 1: '大部晴', 2: '局部多云', 3: '阴',
+      45: '雾', 48: '雾凇',
+      51: '小毛毛雨', 53: '中毛毛雨', 55: '大毛毛雨',
+      61: '小雨', 63: '中雨', 65: '大雨',
+      71: '小雪', 73: '中雪', 75: '大雪',
+      80: '小阵雨', 81: '中阵雨', 82: '大阵雨',
+      95: '雷暴', 96: '雷暴伴小冰雹', 99: '雷暴伴大冰雹'
+    };
+    return codes[code] || '未知';
+  }
+  
+  // AQI等级
+  function getAQILevel(aqi) {
+    if (aqi <= 50) return '优';
+    if (aqi <= 100) return '良';
+    if (aqi <= 150) return '轻度污染';
+    if (aqi <= 200) return '中度污染';
+    if (aqi <= 300) return '重度污染';
+    return '严重污染';
+  }
+  
+  // 获取天气数据（Open-Meteo API，免费，支持CORS）
+  async function fetchWeatherData() {
+    try {
+      const city = CITIES[Math.floor(Math.random() * CITIES.length)];
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&timezone=auto`;
+      
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('天气API请求失败');
+      
+      const data = await response.json();
+      const current = data.current || {};
+      
+      return {
+        city: city.name,
+        temperature: current.temperature_2m,
+        apparent_temperature: current.apparent_temperature,
+        humidity: current.relative_humidity_2m,
+        precipitation: current.precipitation,
+        weather_code: current.weather_code,
+        wind_speed: current.wind_speed_10m,
+        weather_description: getWeatherDescription(current.weather_code)
+      };
+    } catch (error) {
+      console.error('获取天气数据失败:', error);
+      return null;
     }
-  };
+  }
+  
+  // 获取空气质量数据（WAQI API，免费，支持CORS）
+  async function fetchAirQualityData() {
+    try {
+      const city = CITIES[Math.floor(Math.random() * CITIES.length)];
+      const url = `https://api.waqi.info/feed/${city.name.toLowerCase()}/?token=demo`;
+      
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('空气质量API请求失败');
+      
+      const data = await response.json();
+      if (data.status === 'ok' && data.data) {
+        return {
+          city: city.name,
+          aqi: data.data.aqi,
+          dominentpol: data.data.dominentpol,
+          pm25: data.data.iaqi?.pm25?.v,
+          pm10: data.data.iaqi?.pm10?.v,
+          o3: data.data.iaqi?.o3?.v,
+          no2: data.data.iaqi?.no2?.v,
+          so2: data.data.iaqi?.so2?.v,
+          co: data.data.iaqi?.co?.v,
+          aqi_level: getAQILevel(data.data.aqi)
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('获取空气质量数据失败:', error);
+      return null;
+    }
+  }
+  
+  // 获取模拟数据（用于其他模块）
+  function getMockData(moduleId) {
+    const mockDataMap = {
+      immortality: {
+        gene_expression: Math.floor(Math.random() * 1000),
+        telomere_length: (Math.random() * 10 + 5).toFixed(2),
+        cell_viability: (Math.random() * 100).toFixed(1) + '%'
+      },
+      resource: {
+        mineral_reserves: Math.floor(Math.random() * 10000),
+        energy_production: Math.floor(Math.random() * 100000),
+        freshwater: (Math.random() * 100).toFixed(1) + '%'
+      },
+      ecosystem: {
+        species_count: Math.floor(Math.random() * 10000),
+        habitat_coverage: (Math.random() * 100).toFixed(1) + '%',
+        ecosystem_health: (Math.random() * 100).toFixed(1) + '%'
+      },
+      space: {
+        building_count: Math.floor(Math.random() * 1000000),
+        urban_area: (Math.random() * 1000).toFixed(1) + 'km²',
+        population_density: Math.floor(Math.random() * 10000) + '人/km²'
+      },
+      cosmos: {
+        galaxy_count: Math.floor(Math.random() * 1000),
+        star_count: Math.floor(Math.random() * 1000000),
+        exoplanet_count: Math.floor(Math.random() * 5000)
+      },
+      economy: {
+        global_gdp: '$' + (Math.random() * 100).toFixed(2) + '万亿',
+        market_cap: '$' + (Math.random() * 1000).toFixed(2) + '万亿',
+        inflation_rate: (Math.random() * 10).toFixed(2) + '%'
+      },
+      karma: {
+        credit_score: Math.floor(Math.random() * 850),
+        good_deeds: Math.floor(Math.random() * 10000),
+        social_trust: (Math.random() * 100).toFixed(1) + '%'
+      },
+      marriage: {
+        marriage_rate: (Math.random() * 100).toFixed(1) + '%',
+        family_count: Math.floor(Math.random() * 1000000),
+        average_age: (Math.random() * 30 + 20).toFixed(1) + '岁'
+      },
+      education: {
+        literacy_rate: (Math.random() * 100).toFixed(1) + '%',
+        paper_count: Math.floor(Math.random() * 100000),
+        average_iq: Math.floor(Math.random() * 50 + 100)
+      },
+      medical: {
+        life_expectancy: (Math.random() * 30 + 60).toFixed(1) + '岁',
+        hospital_count: Math.floor(Math.random() * 100000),
+        vaccination_rate: (Math.random() * 100).toFixed(1) + '%'
+      },
+      entertainment: {
+        content_count: Math.floor(Math.random() * 1000000),
+        streaming_hours: Math.floor(Math.random() * 10000) + '小时',
+        user_engagement: (Math.random() * 100).toFixed(1) + '%'
+      },
+      ai: {
+        model_count: Math.floor(Math.random() * 10000),
+        ai_agents: Math.floor(Math.random() * 100000),
+        compute_capacity: (Math.random() * 1000).toFixed(1) + 'PFLOPS'
+      },
+      spirit: {
+        mental_health_index: (Math.random() * 100).toFixed(1),
+        meditation_practitioners: Math.floor(Math.random() * 1000000),
+        philosophy_papers: Math.floor(Math.random() * 10000)
+      }
+    };
+    
+    return mockDataMap[moduleId] || {};
+  }
+  
+  // 更新实时数据面板
+  async function updateRealtimePanel() {
+    try {
+      // 获取天气数据
+      const weatherData = await fetchWeatherData();
+      const airQualityData = await fetchAirQualityData();
+      
+      // 更新面板显示
+      const panel = document.getElementById('realtimePanel');
+      if (!panel) return;
+      
+      let html = '<div style="margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(0,255,157,0.2);">';
+      html += '<span style="color:#00ff9d;font-weight:bold;">📡 实时数据同步</span>';
+      html += '<span style="float:right;color:#00ff9d;font-size:10px;">● 已同步</span>';
+      html += '</div>';
+      
+      // 显示天气数据
+      if (weatherData) {
+        html += '<div style="margin-bottom:6px;padding:4px;background:rgba(0,255,157,0.05);border-radius:4px;">';
+        html += `<div style="color:#00ff9d;font-size:11px;">🌦️ ${weatherData.city}</div>`;
+        html += `<div style="color:#fff;font-size:12px;margin-top:2px;">温度: ${weatherData.temperature}°C</div>`;
+        html += `<div style="color:#aaa;font-size:10px;">湿度: ${weatherData.humidity}% | ${weatherData.weather_description}</div>`;
+        html += '</div>';
+      }
+      
+      // 显示空气质量数据
+      if (airQualityData) {
+        html += '<div style="margin-bottom:6px;padding:4px;background:rgba(0,255,157,0.05);border-radius:4px;">';
+        html += `<div style="color:#00ff9d;font-size:11px;">🌬️ ${airQualityData.city}</div>`;
+        html += `<div style="color:#fff;font-size:12px;margin-top:2px;">AQI: ${airQualityData.aqi} (${airQualityData.aqi_level})</div>`;
+        html += `<div style="color:#aaa;font-size:10px;">PM2.5: ${airQualityData.pm25 || 'N/A'} | PM10: ${airQualityData.pm10 || 'N/A'}</div>`;
+        html += '</div>';
+      }
+      
+      // 显示其他模块的模拟数据
+      const otherModules = ['immortality', 'resource', 'ecosystem', 'space', 'cosmos', 'economy', 'karma', 'marriage', 'education', 'medical', 'entertainment', 'ai', 'spirit'];
+      for (let i = 0; i < 3; i++) {
+        const moduleId = otherModules[Math.floor(Math.random() * otherModules.length)];
+        const mockData = getMockData(moduleId);
+        const moduleInfo = MODULES[moduleId];
+        
+        html += '<div style="margin-bottom:4px;padding:3px 0;border-bottom:1px dashed rgba(0,255,157,0.1);">';
+        html += `<span style="color:#00ff9d;">${moduleInfo.icon} ${moduleInfo.name}</span>`;
+        html += `<span style="float:right;color:#888;font-size:10px;">${Object.values(mockData)[0] || '同步中'}</span>`;
+        html += '</div>';
+      }
+      
+      html += '<div style="margin-top:8px;padding-top:6px;border-top:1px solid rgba(0,255,157,0.1);font-size:10px;color:#666;">';
+      html += '最后更新: ' + new Date().toLocaleTimeString();
+      html += '</div>';
+      
+      panel.innerHTML = html;
+    } catch (error) {
+      console.error('更新实时数据面板失败:', error);
+    }
+  }
   
   // 启动实时数据同步
   function startRealtimeSync() {
-    updateStatus('● 连接中', '#ffaa00');
+    // 立即更新一次
+    updateRealtimePanel();
     
-    // 先尝试REST API获取一次数据
-    fetchRealtimeData();
-    
-    // 尝试SSE连接
-    connectSSE();
-    
-    // 定时刷新（每10秒）作为备用
-    window.realtimeInterval = setInterval(fetchRealtimeData, 10000);
+    // 每10秒更新一次
+    setInterval(updateRealtimePanel, 10000);
   }
   
-  // 停止实时数据同步
-  function stopRealtimeSync() {
-    if (eventSource) {
-      eventSource.close();
-      eventSource = null;
-    }
-    if (window.realtimeInterval) {
-      clearInterval(window.realtimeInterval);
-      window.realtimeInterval = null;
-    }
+  // 页面加载完成后启动
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startRealtimeSync);
+  } else {
+    startRealtimeSync();
   }
   
-  // 连接SSE实时推送
-  function connectSSE() {
-    try {
-      eventSource = new EventSource('/api/stream');
-      
-      eventSource.onopen = function() {
-        updateStatus('● 实时连接', '#00ff9d');
-        reconnectAttempts = 0;
-      };
-      
-      eventSource.onmessage = function(event) {
-        try {
-          const data = JSON.parse(event.data);
-          renderRealtimeData(data);
-        } catch(e) {
-          console.error('SSE数据解析失败:', e);
-        }
-      };
-      
-      eventSource.onerror = function() {
-        updateStatus('● 重连中', '#ff6600');
-        if (reconnectAttempts < MAX_RECONNECT) {
-          reconnectAttempts++;
-          setTimeout(connectSSE, 3000);
-        } else {
-          updateStatus('● REST模式', '#888');
-        }
-      };
-    } catch(e) {
-      console.error('SSE连接失败:', e);
-      updateStatus('● REST模式', '#888');
-    }
-  }
-  
-  // 通过REST API获取实时数据
-  function fetchRealtimeData() {
-    fetch('/api/realtime')
-      .then(response => response.json())
-      .then(data => {
-        renderRealtimeData(data);
-        updateStatus('● 已同步', '#00ff9d');
-      })
-      .catch(error => {
-        console.error('获取实时数据失败:', error);
-        updateStatus('● 离线', '#ff4444');
-      });
-  }
-  
-  // 渲染实时数据
-  function renderRealtimeData(data) {
-    const content = document.getElementById('realtimeContent');
-    const modules = data.modules || data.data || {};
-    
-    let html = '';
-    let totalRecords = 0;
-    
-    for (const [mid, modData] of Object.entries(modules)) {
-      const name = moduleNames[mid] || mid;
-      const count = modData.count || (modData.items || []).length;
-      totalRecords += count;
-      
-      // 获取第一条数据的摘要
-      let summary = '';
-      const items = modData.items || [];
-      if (items.length > 0) {
-        const first = items[0];
-        const val = first.value || {};
-        // 尝试提取有意义的字段
-        if (val.temperature !== undefined) {
-          summary = `${val.city || first.key}: ${val.temperature}°C`;
-        } else if (val.aqi !== undefined) {
-          summary = `${val.city || first.key}: AQI ${val.aqi}`;
-        } else if (val.value !== undefined) {
-          summary = `${first.key}: ${val.value}${val.unit || ''}`;
-        } else {
-          summary = `${first.key}: 已同步`;
-        }
-      }
-      
-      html += `<div style="margin-bottom:4px;padding:3px 0;border-bottom:1px dashed rgba(0,255,157,0.1);">
-        <span style="color:#00ff9d;">${name}</span>
-        <span style="float:right;color:#888;">${count}条</span>
-        ${summary ? `<div style="color:#666;font-size:10px;margin-top:2px;">${summary}</div>` : ''}
-      </div>`;
-    }
-    
-    if (html === '') {
-      html = '<div style="color:#888;">暂无同步数据，等待首次同步...</div>';
-    }
-    
-    content.innerHTML = html;
-    document.getElementById('lastUpdateTime').textContent = new Date().toLocaleTimeString();
-  }
-  
-  // 更新连接状态
-  function updateStatus(text, color) {
-    const status = document.getElementById('realtimeStatus');
-    if (status) {
-      status.textContent = text;
-      status.style.color = color;
-    }
-  }
-  
-  // 页面加载完成后自动启动实时同步
-  window.addEventListener('load', function() {
-    // 延迟2秒后自动启动，等待页面完全加载
-    setTimeout(function() {
-      // 检查是否在统一服务环境中（API可用）
-      fetch('/api/health')
-        .then(() => {
-          // API可用，自动显示实时面板
-          document.getElementById('realtimePanel').style.display = 'block';
-          document.getElementById('realtimeToggle').style.display = 'none';
-          startRealtimeSync();
-        })
-        .catch(() => {
-          // API不可用（独立HTML文件模式），不启动实时同步
-          console.log('独立HTML模式，实时同步未启用');
-        });
-    }, 2000);
-  });
-  
-  // 页面卸载时清理
-  window.addEventListener('beforeunload', function() {
-    stopRealtimeSync();
-  });
+  // 暴露到全局
+  window.universeRealtimeSync = {
+    update: updateRealtimePanel,
+    start: startRealtimeSync
+  };
 })();
+</script>
 </script>
 </body>
 </html>
