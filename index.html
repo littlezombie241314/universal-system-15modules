@@ -1,0 +1,1944 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全宇宙恒等系统 · UNIVERSAL EQUALITY SYSTEM v∞</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#02060f;--cyan:#00f0ff;--cyan-dim:#0a7e8c;--green:#00ff88;--magenta:#ff2d95;
+  --amber:#ffb800;--red:#ff3355;--purple:#a855f7;
+  --text:#c8f4ff;--text-dim:#5a8a9a;--panel:rgba(4,18,34,0.72);
+  --border:rgba(0,240,255,0.25);--border-glow:rgba(0,240,255,0.5);
+  --mono:'Courier New','Consolas',monospace;
+}
+html,body{height:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;line-height:1.6;position:relative}
+#stars{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(0,240,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,0.04) 1px,transparent 1px);
+  background-size:40px 40px;-webkit-mask-image:radial-gradient(ellipse at 50% 0%,black 0%,transparent 80%);mask-image:radial-gradient(ellipse at 50% 0%,black 0%,transparent 80%)}
+.scanlines{position:fixed;inset:0;z-index:9998;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,0.15) 0,rgba(0,0,0,0.15) 1px,transparent 1px,transparent 3px)}
+.scanlines::after{content:'';position:absolute;inset:0;background:linear-gradient(rgba(0,240,255,0.03),rgba(0,240,255,0));animation:flicker 4s infinite}
+@keyframes flicker{0%,100%{opacity:1}48%{opacity:.96}50%{opacity:.9}52%{opacity:.98}}
+.vignette{position:fixed;inset:0;z-index:9997;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.6) 100%)}
+
+#boot{position:fixed;inset:0;z-index:10000;background:#000;display:flex;flex-direction:column;justify-content:center;padding:8vw;overflow:hidden;transition:opacity .8s}
+#boot.hide{opacity:0;pointer-events:none}
+.boot-line{color:var(--green);font-size:14px;margin:2px 0;opacity:0;animation:bootIn .15s forwards}
+.boot-line.dim{color:var(--text-dim)}.boot-line.warn{color:var(--amber)}.boot-line.cyan{color:var(--cyan)}
+.boot-line.title{color:#fff;font-size:clamp(18px,3vw,32px);text-shadow:0 0 20px var(--cyan);margin:16px 0;font-weight:bold}
+@keyframes bootIn{to{opacity:1}}
+.boot-cursor{display:inline-block;width:10px;height:16px;background:var(--green);animation:blink 0.8s infinite;vertical-align:middle}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+
+#app{position:relative;z-index:1;max-width:1600px;margin:0 auto;padding:12px}
+.hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 16px;border:1px solid var(--border);background:var(--panel);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);position:relative;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px))}
+.hdr::before{content:'';position:absolute;top:-1px;left:20px;right:20px;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);animation:scan 3s linear infinite}
+@keyframes scan{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.hdr-title{display:flex;align-items:center;gap:10px}
+.hdr-logo{width:32px;height:32px;border:2px solid var(--cyan);border-radius:50%;position:relative;animation:spin 8s linear infinite;box-shadow:0 0 12px var(--cyan),inset 0 0 8px var(--cyan)}
+.hdr-logo::before{content:'∞';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--cyan);text-shadow:0 0 8px var(--cyan)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hdr-name{font-size:16px;font-weight:bold;color:#fff;letter-spacing:2px;text-shadow:0 0 10px var(--cyan)}
+.hdr-sub{font-size:10px;color:var(--text-dim);letter-spacing:3px}
+.hdr-clock{text-align:right}
+.hdr-time{font-size:24px;color:var(--cyan);text-shadow:0 0 12px var(--cyan);font-weight:bold;letter-spacing:2px}
+.hdr-date{font-size:10px;color:var(--text-dim);letter-spacing:1px}
+.hdr-status{display:flex;gap:6px;align-items:center;font-size:10px;color:var(--green)}
+.hdr-shield{display:flex;gap:6px;align-items:center;font-size:10px;color:var(--cyan);border:1px solid rgba(0,240,255,0.25);padding:3px 10px;letter-spacing:1px;animation:shieldPulse 3s ease-in-out infinite}
+.shield-dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);animation:pulse 2s infinite}
+.hdr-refill{display:flex;gap:6px;align-items:center;font-size:10px;color:var(--green);border:1px solid rgba(0,255,136,0.25);padding:3px 10px;letter-spacing:1px}
+.refill-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 1.5s infinite}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+.hero{margin-top:10px;padding:20px;border:1px solid var(--border);background:var(--panel);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);text-align:center;position:relative;overflow:hidden;
+  clip-path:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,24px 100%,0 calc(100% - 24px))}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,var(--cyan),transparent 30%);animation:rotateBg 8s linear infinite;opacity:.06}
+@keyframes rotateBg{to{transform:rotate(360deg)}}
+.hero-label{font-size:11px;color:var(--text-dim);letter-spacing:4px;margin-bottom:6px;position:relative}
+.hero-balance{font-size:clamp(28px,6vw,56px);font-weight:bold;color:var(--cyan);text-shadow:0 0 30px var(--cyan),0 0 60px rgba(0,240,255,.4);letter-spacing:2px;position:relative;font-family:var(--mono)}
+.hero-balance .unit{font-size:.4em;color:var(--green);text-shadow:0 0 12px var(--green)}
+.hero-meta{font-size:11px;color:var(--text-dim);margin-top:8px;letter-spacing:1px;position:relative;line-height:1.8}
+.hero-meta span{color:var(--green);margin:0 6px}
+
+.stat-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}
+.stat{padding:12px;border:1px solid var(--border);background:var(--panel);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);position:relative;overflow:hidden;transition:all .3s;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.stat:hover{border-color:var(--border-glow);box-shadow:0 0 16px rgba(0,240,255,.2)}
+.stat-icon{font-size:20px;margin-bottom:4px}
+.stat-val{font-size:20px;font-weight:bold;color:#fff;text-shadow:0 0 10px currentColor}
+.stat-lbl{font-size:10px;color:var(--text-dim);letter-spacing:1px}
+.stat.cyan{color:var(--cyan)}.stat.green{color:var(--green)}.stat.amber{color:var(--amber)}.stat.magenta{color:var(--magenta)}.stat.purple{color:var(--purple)}
+
+.tabs{display:flex;flex-wrap:wrap;gap:4px;margin-top:12px}
+.tab{padding:8px 14px;border:1px solid var(--border);background:rgba(4,18,34,0.5);color:var(--text-dim);cursor:pointer;font-family:var(--mono);font-size:12px;letter-spacing:1px;transition:all .2s;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.tab:hover{color:var(--cyan);border-color:var(--cyan-dim)}
+.tab.active{background:rgba(0,240,255,0.1);color:var(--cyan);border-color:var(--cyan);box-shadow:0 0 12px rgba(0,240,255,.3);text-shadow:0 0 8px var(--cyan)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:10px;margin-top:10px}
+.panel{border:1px solid var(--border);background:var(--panel);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:14px;position:relative;transition:all .3s;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+.panel:hover{border-color:var(--border-glow);box-shadow:0 0 20px rgba(0,240,255,.12)}
+.panel.wide{grid-column:1/-1}
+.panel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(0,240,255,0.12)}
+.panel-title{font-size:13px;font-weight:bold;color:var(--cyan);letter-spacing:2px;text-shadow:0 0 8px rgba(0,240,255,.4)}
+.panel-title .ico{margin-right:6px}
+.panel-badge{font-size:9px;padding:2px 8px;border:1px solid var(--green);color:var(--green);letter-spacing:1px}
+.panel-shield-tag{font-size:8px;padding:1px 5px;border:1px solid rgba(0,240,255,0.3);color:var(--cyan);letter-spacing:1px;margin-left:4px;white-space:nowrap}
+.panel-refill-tag{font-size:8px;padding:1px 5px;border:1px solid rgba(0,255,136,0.3);color:var(--green);letter-spacing:1px;margin-left:4px;white-space:nowrap}
+
+.acct{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px dashed rgba(0,240,255,0.1)}
+.acct:last-child{border-bottom:none}
+.acct-left{display:flex;align-items:center;gap:10px}
+.acct-ico{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;background:rgba(0,240,255,0.08);border:1px solid var(--border)}
+.acct-name{font-size:12px;color:var(--text)}.acct-status{font-size:9px;color:var(--green)}
+.acct-bal{font-size:16px;font-weight:bold;color:var(--cyan);text-shadow:0 0 8px rgba(0,240,255,.4)}
+.acct-bal .cur{font-size:.6em;color:var(--green);margin-right:2px}
+
+.bar-row{margin:8px 0}
+.bar-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim);margin-bottom:3px}
+.bar-lbl .v{color:var(--green)}
+.bar{height:6px;background:rgba(0,240,255,0.08);border:1px solid rgba(0,240,255,0.15);position:relative;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan-dim),var(--cyan));box-shadow:0 0 8px var(--cyan);position:relative;transition:width 1s}
+.bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shimmer 2s infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.bar-fill.green{background:linear-gradient(90deg,#005533,var(--green));box-shadow:0 0 8px var(--green)}
+.bar-fill.amber{background:linear-gradient(90deg,#664400,var(--amber));box-shadow:0 0 8px var(--amber)}
+.bar-fill.magenta{background:linear-gradient(90deg,#660044,var(--magenta));box-shadow:0 0 8px var(--magenta)}
+.bar-fill.purple{background:linear-gradient(90deg,#440066,var(--purple));box-shadow:0 0 8px var(--purple)}
+
+.radar-wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.radar{width:120px;height:120px;border-radius:50%;border:1px solid var(--cyan-dim);position:relative;flex-shrink:0;background:radial-gradient(circle,rgba(0,240,255,0.05) 0,transparent 70%)}
+.radar::before,.radar::after{content:'';position:absolute;border:1px solid rgba(0,240,255,0.15);border-radius:50%}
+.radar::before{inset:20%}.radar::after{inset:40%}
+.radar-cross{position:absolute;inset:0}
+.radar-cross::before,.radar-cross::after{content:'';position:absolute;background:rgba(0,240,255,0.15)}
+.radar-cross::before{left:50%;top:0;bottom:0;width:1px;transform:translateX(-50%)}
+.radar-cross::after{top:50%;left:0;right:0;height:1px;transform:translateY(-50%)}
+.radar-sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(0,240,255,0.4),transparent 60deg);animation:radarSpin 3s linear infinite}
+@keyframes radarSpin{to{transform:rotate(360deg)}}
+.radar-dot{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.radar-stats{flex:1;min-width:140px}
+.radar-stat{display:flex;justify-content:space-between;padding:4px 0;font-size:11px;border-bottom:1px dashed rgba(0,240,255,0.08)}
+.radar-stat .k{color:var(--text-dim)}.radar-stat .v{color:var(--green);font-weight:bold}
+
+.planets{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.planet{padding:10px;border:1px solid rgba(0,240,255,0.15);background:rgba(0,240,255,0.03);position:relative;overflow:hidden;transition:all .3s;cursor:default}
+.planet:hover{border-color:var(--cyan);box-shadow:0 0 14px rgba(0,240,255,.2);transform:translateY(-2px)}
+.planet-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.planet-orb{width:28px;height:28px;border-radius:50%;flex-shrink:0;box-shadow:0 0 10px currentColor}
+.planet-name{font-size:13px;font-weight:bold;color:#fff}.planet-civ{font-size:9px;color:var(--text-dim)}
+.planet-rows{font-size:10px;color:var(--text-dim)}
+.planet-rows div{display:flex;justify-content:space-between;padding:2px 0}
+.planet-rows .v{color:var(--cyan)}
+.planet-status{position:absolute;top:8px;right:8px;font-size:8px;color:var(--green);border:1px solid var(--green);padding:1px 5px}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border:1px solid var(--cyan);background:rgba(0,240,255,0.08);color:var(--cyan);font-family:var(--mono);font-size:12px;cursor:pointer;letter-spacing:1px;transition:all .2s;text-transform:uppercase;position:relative;overflow:hidden;
+  clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,8px 100%,0 calc(100% - 8px))}
+.btn:hover{background:rgba(0,240,255,0.2);box-shadow:0 0 16px rgba(0,240,255,.4);color:#fff}
+.btn:active{transform:scale(.97)}
+.btn.green{border-color:var(--green);background:rgba(0,255,136,0.08);color:var(--green)}
+.btn.green:hover{background:rgba(0,255,136,0.2);box-shadow:0 0 16px rgba(0,255,136,.4)}
+.btn.magenta{border-color:var(--magenta);background:rgba(255,45,149,0.08);color:var(--magenta)}
+.btn.magenta:hover{background:rgba(255,45,149,0.2);box-shadow:0 0 16px rgba(255,45,149,.4)}
+.btn.amber{border-color:var(--amber);background:rgba(255,184,0,0.08);color:var(--amber)}
+.btn.amber:hover{background:rgba(255,184,0,0.2);box-shadow:0 0 16px rgba(255,184,0,.4)}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+
+.console{height:200px;overflow-y:auto;background:rgba(0,0,0,0.5);border:1px solid rgba(0,240,255,0.15);padding:10px;font-size:11px;font-family:var(--mono);scrollbar-width:thin;scrollbar-color:var(--cyan-dim) transparent}
+.console::-webkit-scrollbar{width:6px}.console::-webkit-scrollbar-thumb{background:var(--cyan-dim)}
+.log-line{padding:1px 0;color:var(--text-dim)}
+.log-line .ts{color:var(--cyan-dim);margin-right:6px}
+.log-line.ok{color:var(--green)}.log-line.warn{color:var(--amber)}.log-line.err{color:var(--red)}.log-line.info{color:var(--cyan)}.log-line.sys{color:var(--purple)}
+
+.work-display{text-align:center;padding:10px 0}
+.work-earned{font-size:36px;font-weight:bold;color:var(--amber);text-shadow:0 0 16px var(--amber)}
+.work-status{font-size:11px;color:var(--text-dim);margin-top:4px}
+.match-display{text-align:center;padding:16px 0}
+.match-pct{font-size:48px;font-weight:bold;color:var(--magenta);text-shadow:0 0 24px var(--magenta)}
+.match-pairs{font-size:12px;color:var(--text-dim);margin-top:6px}
+.warp-display{text-align:center;padding:10px 0}
+.warp-from,.warp-to{font-size:14px;color:var(--cyan);margin:4px 0}
+.warp-progress{margin:12px 0}
+select{background:rgba(0,240,255,0.08);border:1px solid var(--border);color:var(--cyan);padding:6px 10px;font-family:var(--mono);font-size:13px;border-radius:2px}
+select option{background:#040b1a;color:var(--cyan)}
+
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}
+.res-item{padding:10px 4px;border:1px solid rgba(0,240,255,0.12);background:rgba(0,240,255,0.03)}
+.res-ico{font-size:22px}.res-val{font-size:16px;font-weight:bold;color:var(--green);text-shadow:0 0 8px rgba(0,255,136,.4)}
+.res-lbl{font-size:9px;color:var(--text-dim);letter-spacing:1px}
+
+.ftr{margin-top:12px;padding:10px 16px;border:1px solid var(--border);background:var(--panel);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:10px;color:var(--text-dim);letter-spacing:1px}
+.ftr .ok{color:var(--green)}
+
+#toast{position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-100px);z-index:10001;padding:12px 24px;border:1px solid var(--cyan);background:rgba(4,18,34,0.95);color:var(--cyan);font-family:var(--mono);font-size:13px;letter-spacing:1px;transition:transform .4s;box-shadow:0 0 24px rgba(0,240,255,.4);
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+#toast.show{transform:translateX(-50%) translateY(0)}
+.section{display:none}.section.active{display:block;animation:fadeIn .4s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+#globeCanvas{width:100%;height:180px;display:block}
+@media(max-width:640px){.hdr-time{font-size:18px}.grid{grid-template-columns:1fr}.hero-balance{font-size:28px}.res-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ============ PUSH BROADCAST ============ */
+.hdr-push{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--magenta);background:rgba(255,45,149,0.1);color:var(--magenta);font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px;transition:all .2s;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))}
+.hdr-push:hover{background:rgba(255,45,149,0.25);box-shadow:0 0 14px rgba(255,45,149,.5);color:#fff}
+.hdr-push .pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--magenta);box-shadow:0 0 6px var(--magenta);animation:pulse 1.2s infinite}
+
+.ticker{margin-top:8px;border:1px solid var(--magenta);background:rgba(255,45,149,0.06);overflow:hidden;position:relative;height:32px;display:flex;align-items:center;
+  clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.ticker-label{flex-shrink:0;background:var(--magenta);color:#fff;font-size:10px;padding:4px 10px;font-weight:bold;letter-spacing:1px;z-index:2;height:100%;display:flex;align-items:center}
+.ticker-track{display:flex;white-space:nowrap;animation:tickerScroll 40s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker-item{padding:0 40px;font-size:11px;color:var(--magenta);letter-spacing:1px}
+.ticker-item .ticker-time{color:var(--text-dim);margin-right:8px}
+@keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* broadcast modal */
+.modal-overlay{position:fixed;inset:0;z-index:10002;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.show{display:flex;animation:fadeIn .3s}
+.modal{width:100%;max-width:560px;border:1px solid var(--magenta);background:rgba(4,18,34,0.97);padding:20px;position:relative;box-shadow:0 0 40px rgba(255,45,149,.3);
+  clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px))}
+.modal-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,45,149,0.2)}
+.modal-title{font-size:15px;font-weight:bold;color:var(--magenta);letter-spacing:2px;text-shadow:0 0 10px rgba(255,45,149,.5)}
+.modal-close{background:none;border:1px solid var(--text-dim);color:var(--text-dim);width:26px;height:26px;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{border-color:var(--red);color:var(--red)}
+.modal textarea{width:100%;height:100px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,45,149,0.3);color:var(--text);font-family:var(--mono);font-size:13px;padding:10px;resize:none;outline:none;transition:border-color .2s}
+.modal textarea:focus{border-color:var(--magenta);box-shadow:0 0 10px rgba(255,45,149,.2)}
+.modal-target{margin:10px 0;font-size:11px;color:var(--text-dim)}
+.modal-target label{margin-right:14px;cursor:pointer;color:var(--text-dim)}
+.modal-target input{margin-right:4px;accent-color:var(--magenta)}
+.modal-quick{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.quick-btn{padding:4px 10px;border:1px solid rgba(0,240,255,0.3);background:rgba(0,240,255,0.05);color:var(--cyan);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .2s}
+.quick-btn:hover{border-color:var(--cyan);background:rgba(0,240,255,0.15)}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+
+/* broadcast alert popup */
+.broadcast-alert{position:fixed;top:70px;right:20px;z-index:10003;max-width:380px;border:1px solid var(--magenta);background:rgba(4,18,34,0.97);padding:14px 16px;box-shadow:0 0 30px rgba(255,45,149,.4);transform:translateX(420px);transition:transform .5s cubic-bezier(.2,.8,.2,1);
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px))}
+.broadcast-alert.show{transform:translateX(0)}
+.broadcast-alert::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--magenta),transparent);animation:scan 2s linear infinite}
+.ba-hdr{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ba-icon{font-size:18px;animation:pulse 1s infinite}
+.ba-title{font-size:12px;font-weight:bold;color:var(--magenta);letter-spacing:2px}
+.ba-time{font-size:9px;color:var(--text-dim);margin-left:auto}
+.ba-msg{font-size:13px;color:var(--text);line-height:1.6}
+.ba-target{font-size:10px;color:var(--cyan);margin-top:6px}
+
+/* ============ PAYMENT CENTER ============ */
+.pay-tabs{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
+.pay-tab{padding:8px 16px;border:1px solid var(--border);background:rgba(0,240,255,0.04);color:var(--text-dim);cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:1px;transition:all .2s;clip-path:polygon(0 0,calc(100% - 6px) 0,100% 6px,100% 100%,6px 100%,0 calc(100% - 6px))}
+.pay-tab:hover{color:var(--cyan);border-color:var(--cyan-dim)}
+.pay-tab.active{background:rgba(0,240,255,0.12);color:var(--cyan);border-color:var(--cyan);box-shadow:0 0 10px rgba(0,240,255,.3);text-shadow:0 0 6px var(--cyan)}
+.pay-section{display:none}.pay-section.active{display:block;animation:fadeIn .3s}
+.pay-body{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.qr-box{flex-shrink:0;text-align:center}
+.qr-frame{display:inline-block;padding:12px;background:#fff;border:2px solid var(--cyan);box-shadow:0 0 20px rgba(0,240,255,.4);position:relative}
+.qr-frame canvas{display:block}
+.qr-frame .qr-logo{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:34px;height:34px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;border-radius:4px;border:1px solid #eee}
+.qr-label{margin-top:8px;font-size:11px;color:var(--text-dim);letter-spacing:1px}
+.qr-amount{font-size:20px;color:var(--amber);font-weight:bold;text-shadow:0 0 10px var(--amber);margin-top:4px}
+.pay-form{flex:1;min-width:240px}
+.pay-field{margin-bottom:12px}
+.pay-field label{display:block;font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:4px}
+.pay-field input,.pay-field select{width:100%;background:rgba(0,0,0,0.5);border:1px solid rgba(0,240,255,0.3);color:var(--cyan);padding:8px 10px;font-family:var(--mono);font-size:13px;outline:none;transition:border-color .2s;border-radius:2px}
+.pay-field input:focus,.pay-field select:focus{border-color:var(--cyan);box-shadow:0 0 8px rgba(0,240,255,.2)}
+.pay-field input::placeholder{color:var(--text-dim)}
+.pay-field select option{background:#040b1a}
+.pay-account{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid rgba(0,240,255,0.15);background:rgba(0,240,255,0.03);margin-bottom:8px;font-size:11px}
+.pay-account .pa-ico{font-size:16px}.pay-account .pa-name{flex:1;color:var(--text)}.pay-account .pa-bal{color:var(--green);font-size:10px}
+.barcode-num{font-size:18px;letter-spacing:4px;color:var(--cyan);text-shadow:0 0 8px var(--cyan);margin-top:8px;font-weight:bold}
+.barcode-refresh{font-size:9px;color:var(--text-dim);margin-top:4px}
+.pay-result{margin-top:12px;padding:12px;border:1px solid rgba(0,255,136,0.3);background:rgba(0,255,136,0.05);display:none}
+.pay-result.show{display:block;animation:fadeIn .3s}
+.pay-result .pr-title{font-size:13px;font-weight:bold;margin-bottom:6px}
+.pay-result.ok .pr-title{color:var(--green)}
+.pay-result .pr-detail{font-size:10px;color:var(--text-dim);line-height:1.8}
+.scan-anim{display:inline-block;width:172px;height:172px;border:2px solid var(--cyan);position:relative;overflow:hidden;background:rgba(0,240,255,0.03)}
+.scan-anim .scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 10px var(--cyan);animation:scanLine 1.5s ease-in-out infinite}
+@keyframes scanLine{0%{top:0}50%{top:calc(100% - 2px)}100%{top:0}}
+.scan-anim .scan-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px;opacity:.2}
+.pay-history{margin-top:14px;max-height:150px;overflow-y:auto;font-size:10px}
+.pay-history-item{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed rgba(0,240,255,0.08)}
+.pay-history-item .phi-time{color:var(--text-dim)}.pay-history-item .phi-desc{color:var(--text);flex:1;margin:0 10px}.pay-history-item .phi-amt{color:var(--amber)}
+
+/* scan viewer */
+.scan-viewer{position:relative;width:180px;height:180px;border:2px solid rgba(0,240,255,0.3);background:rgba(0,10,18,0.8);overflow:hidden}
+.scan-viewer .sv-corner{position:absolute;width:18px;height:18px;border:2px solid var(--cyan);z-index:2}
+.scan-viewer .sv-tl{top:-2px;left:-2px;border-right:none;border-bottom:none}
+.scan-viewer .sv-tr{top:-2px;right:-2px;border-left:none;border-bottom:none}
+.scan-viewer .sv-bl{bottom:-2px;left:-2px;border-right:none;border-top:none}
+.scan-viewer .sv-br{bottom:-2px;right:-2px;border-left:none;border-top:none}
+.scan-viewer .sv-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,240,255,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,240,255,0.06) 1px,transparent 1px);background-size:16px 16px}
+.scan-viewer .sv-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);box-shadow:0 0 10px var(--cyan);top:8%;display:none}
+.scan-viewer.scanning .sv-line{display:block;animation:svScan 1.8s ease-in-out}
+@keyframes svScan{0%{top:8%}50%{top:92%}100%{top:8%}}
+.scan-viewer .sv-status{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-size:9px;color:var(--cyan);z-index:2;text-shadow:0 0 4px var(--cyan);padding:0 4px}
+.scan-viewer .sv-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:36px;opacity:.15}
+.quick-amt{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0 8px}
+.quick-amt button{padding:3px 8px;border:1px solid rgba(0,240,255,0.3);background:rgba(0,240,255,0.05);color:var(--cyan);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .2s}
+.quick-amt button:hover{border-color:var(--cyan);background:rgba(0,240,255,0.18)}
+.pay-methods{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0 8px}
+.pm-btn{padding:4px 10px;border:1px solid rgba(0,240,255,0.3);background:rgba(0,240,255,0.05);color:var(--text-dim);font-family:var(--mono);font-size:10px;cursor:pointer;transition:all .2s}
+.pm-btn:hover{color:var(--cyan);border-color:var(--cyan-dim)}
+.pm-btn.active{background:rgba(0,240,255,0.18);color:var(--cyan);border-color:var(--cyan);box-shadow:0 0 8px rgba(0,240,255,.25)}
+.pwd-input{letter-spacing:6px;text-align:center;font-size:16px!important}
+.pay-steps{margin:10px 0;padding:8px 10px;border:1px solid rgba(0,240,255,0.15);background:rgba(0,0,0,0.3);display:none}
+.pstep{display:flex;align-items:center;gap:6px;padding:3px 0;font-size:10px;color:var(--text-dim)}
+.pstep .pd{width:8px;height:8px;border-radius:50%;border:1px solid currentColor;flex-shrink:0}
+.pstep.done{color:var(--green)}.pstep.done .pd{background:var(--green);border-color:var(--green)}
+.pstep.active{color:var(--cyan);text-shadow:0 0 4px var(--cyan)}.pstep.active .pd{background:var(--cyan);border-color:var(--cyan);animation:pulse 1s infinite}
+.rcard{margin-top:10px;padding:10px 12px;border:1px solid rgba(0,255,136,0.3);background:rgba(0,255,136,0.05)}
+.rcard.fail{border-color:rgba(255,51,85,0.3);background:rgba(255,51,85,0.05)}
+.rcard .rc-title{font-size:13px;font-weight:bold;margin-bottom:6px}
+.rcard.ok .rc-title{color:var(--green)}.rcard.fail .rc-title{color:var(--red)}
+.rcard .rc-row{display:flex;justify-content:space-between;font-size:10px;padding:2px 0;border-bottom:1px dashed rgba(0,240,255,0.08);color:var(--text-dim)}
+.rcard .rc-row span:last-child{color:var(--text)}
+.phi-status{font-size:9px;padding:1px 5px;border-radius:2px}
+.phi-status.ok{color:var(--green);border:1px solid rgba(0,255,136,0.3)}
+.phi-status.fail{color:var(--red);border:1px solid rgba(255,51,85,0.3)}
+/* ============ EMP DEFENSE SYSTEM ============ */
+.emp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}
+.emp-shield{position:relative;width:160px;height:160px;margin:0 auto}
+.emp-shield svg{width:100%;height:100%;animation:shieldPulse 3s ease-in-out infinite}
+@keyframes shieldPulse{0%,100%{filter:drop-shadow(0 0 8px rgba(0,240,255,.5))}50%{filter:drop-shadow(0 0 20px rgba(0,240,255,.9))}}
+.emp-shield-ring{fill:none;stroke:var(--cyan);stroke-width:1.5;opacity:.3}
+.emp-shield-ring.active{stroke:var(--green);opacity:.8;stroke-width:2}
+.emp-shield-hex{fill:rgba(0,240,255,0.04);stroke:var(--cyan);stroke-width:1}
+.emp-shield-core{fill:var(--cyan);opacity:.15}
+.emp-shield-text{font-size:11px;fill:var(--cyan);text-anchor:middle;font-family:var(--mono);text-shadow:0 0 8px var(--cyan)}
+.emp-shield-pct{font-size:22px;fill:var(--green);text-anchor:middle;font-weight:bold;font-family:var(--mono)}
+.layer-card{padding:10px;border:1px solid rgba(0,240,255,0.15);background:rgba(0,240,255,0.03);position:relative;transition:all .3s;overflow:hidden}
+.layer-card:hover{border-color:var(--cyan);box-shadow:0 0 14px rgba(0,240,255,.2)}
+.layer-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green);box-shadow:0 0 8px var(--green)}
+.layer-card.warn::before{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+.layer-card.alert::before{background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse .5s infinite}
+.layer-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.layer-name{font-size:12px;font-weight:bold;color:#fff;display:flex;align-items:center;gap:6px}
+.layer-level{font-size:8px;padding:1px 6px;border:1px solid var(--green);color:var(--green);letter-spacing:1px}
+.layer-card.warn .layer-level{border-color:var(--amber);color:var(--amber)}
+.layer-card.alert .layer-level{border-color:var(--red);color:var(--red)}
+.layer-desc{font-size:10px;color:var(--text-dim);line-height:1.6;margin-bottom:6px}
+.layer-bar{height:4px;background:rgba(0,240,255,0.08);border:1px solid rgba(0,240,255,0.12);position:relative;overflow:hidden}
+.layer-fill{height:100%;background:linear-gradient(90deg,var(--cyan-dim),var(--green));box-shadow:0 0 6px var(--green);transition:width .8s}
+.layer-card.warn .layer-fill{background:linear-gradient(90deg,#664400,var(--amber));box-shadow:0 0 6px var(--amber)}
+.layer-card.alert .layer-fill{background:linear-gradient(90deg,#660000,var(--red));box-shadow:0 0 6px var(--red);animation:pulse .6s infinite}
+.emp-threat{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid rgba(0,240,255,0.12);background:rgba(0,0,0,0.3);margin-bottom:6px;font-size:11px}
+.emp-threat:last-child{margin-bottom:0}
+.threat-indicator{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.threat-indicator.green{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+.threat-indicator.amber{background:var(--amber);box-shadow:0 0 8px var(--amber);animation:pulse 1s infinite}
+.threat-indicator.red{background:var(--red);box-shadow:0 0 10px var(--red);animation:pulse .4s infinite}
+.threat-info{flex:1}
+.threat-name{color:var(--text);font-size:11px}
+.threat-meta{font-size:9px;color:var(--text-dim)}
+.threat-status{font-size:9px;padding:1px 6px;border:1px solid}
+.threat-status.ok{color:var(--green);border-color:rgba(0,255,136,.3)}
+.threat-status.blocked{color:var(--cyan);border-color:rgba(0,240,255,.3)}
+.threat-status.active{color:var(--red);border-color:rgba(255,51,85,.5);animation:pulse .5s infinite}
+.emp-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.emp-stat{padding:10px;border:1px solid rgba(0,240,255,0.12);background:rgba(0,240,255,0.03);text-align:center}
+.emp-stat-val{font-size:22px;font-weight:bold;color:var(--cyan);text-shadow:0 0 10px rgba(0,240,255,.5)}
+.emp-stat-val.green{color:var(--green);text-shadow:0 0 10px rgba(0,255,136,.5)}
+.emp-stat-val.amber{color:var(--amber);text-shadow:0 0 10px rgba(255,184,0,.5)}
+.emp-stat-val.red{color:var(--red);text-shadow:0 0 10px rgba(255,51,85,.5)}
+.emp-stat-lbl{font-size:9px;color:var(--text-dim);letter-spacing:1px;margin-top:2px}
+.emp-alert-banner{padding:10px 14px;border:1px solid var(--red);background:rgba(255,51,85,0.1);color:var(--red);font-size:12px;letter-spacing:1px;display:none;align-items:center;gap:10px;margin-bottom:10px;animation:pulse .8s infinite;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+.emp-alert-banner.show{display:flex}
+.emp-wave{position:absolute;width:100%;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);top:0;animation:empWave 1s linear;opacity:0}
+.emp-wave.active{opacity:1;animation:empWave 1.5s linear}
+@keyframes empWave{0%{top:0;opacity:1}100%{top:100%;opacity:0}}
+.emp-console{height:160px;overflow-y:auto;background:rgba(0,0,0,0.5);border:1px solid rgba(0,240,255,0.15);padding:10px;font-size:11px;font-family:var(--mono);scrollbar-width:thin;scrollbar-color:var(--cyan-dim) transparent}
+.emp-console::-webkit-scrollbar{width:6px}.emp-console::-webkit-scrollbar-thumb{background:var(--cyan-dim)}
+/* System Architecture Diagram */
+.arch-diagram{padding:12px 8px}
+.arch-layer{margin-bottom:6px;position:relative}
+.arch-layer-label{font-size:9px;color:var(--text-dim);letter-spacing:2px;margin-bottom:4px;text-align:center}
+.arch-blocks{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.arch-block{padding:6px 10px;font-size:10px;border:1px solid;text-align:center;flex:1;min-width:80px;clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);transition:all .3s;cursor:default}
+.arch-block:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,240,255,.3)}
+.arch-block .ab-ico{font-size:14px;display:block;margin-bottom:2px}
+.arch-block .ab-name{font-weight:bold;letter-spacing:1px}
+.arch-business .arch-block{border-color:rgba(0,240,255,0.35);background:rgba(0,240,255,0.06);color:var(--cyan)}
+.arch-infra .arch-block{border-color:rgba(168,85,247,0.35);background:rgba(168,85,247,0.06);color:var(--purple)}
+.arch-circulation .arch-block{border-color:rgba(255,184,0,0.4);background:rgba(255,184,0,0.06);color:var(--amber)}
+.arch-defense .arch-block{border-color:rgba(0,255,136,0.35);background:rgba(0,255,136,0.05);color:var(--green)}
+.arch-defense .arch-block.l5{border-color:rgba(255,45,149,0.4);background:rgba(255,45,149,0.06);color:var(--magenta)}
+.arch-foundation{margin-top:8px;padding:8px;border:1px solid rgba(0,255,136,0.3);background:rgba(0,255,136,0.05);text-align:center;font-size:10px;color:var(--green);letter-spacing:2px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.arch-arrow{text-align:center;color:var(--text-dim);font-size:12px;line-height:1;margin:2px 0}
+.arch-connections{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0}
+/* ============ CURRENCY & LANGUAGE SELECTOR ============ */
+.hdr-lang{display:flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid rgba(168,85,247,0.4);background:rgba(168,85,247,0.08);font-family:var(--mono);font-size:10px;letter-spacing:1px}
+.hdr-lang label{color:var(--purple);white-space:nowrap}
+.hdr-lang select{background:rgba(0,0,0,0.4);border:1px solid rgba(168,85,247,0.3);color:var(--purple);padding:3px 6px;font-family:var(--mono);font-size:10px;max-width:120px}
+.hdr-lang select option{background:#040b1a;color:var(--purple)}
+.currency-panel{margin-top:0}
+.currency-selector{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;padding:10px;border:1px solid rgba(0,240,255,0.15);background:rgba(0,240,255,0.03)}
+.currency-selector label{font-size:11px;color:var(--cyan);letter-spacing:1px;white-space:nowrap}
+.currency-selector select{flex:1;min-width:180px;background:rgba(0,0,0,0.4);border:1px solid var(--border);color:var(--cyan);padding:6px 10px;font-family:var(--mono);font-size:12px}
+.currency-selector select option{background:#040b1a;color:var(--cyan)}
+.currency-selector select optgroup{background:#040b1a;color:var(--text-dim);font-style:normal}
+.currency-rate{font-size:10px;color:var(--green);padding:4px 8px;border:1px solid rgba(0,255,136,0.2);background:rgba(0,255,136,0.05);white-space:nowrap}
+.currency-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.currency-tag{padding:4px 10px;border:1px solid rgba(0,240,255,0.2);background:rgba(0,240,255,0.05);font-size:10px;color:var(--cyan);letter-spacing:1px;transition:all .2s}
+.currency-tag:hover{border-color:var(--cyan);background:rgba(0,240,255,0.12);box-shadow:0 0 8px rgba(0,240,255,.3)}
+.multi-currency{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
+.mc-card{padding:10px;border:1px solid rgba(0,240,255,0.15);background:rgba(0,240,255,0.03);text-align:center;transition:all .3s;position:relative;overflow:hidden}
+.mc-card:hover{border-color:var(--border-glow);box-shadow:0 0 16px rgba(0,240,255,.2);transform:translateY(-2px)}
+.mc-card::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(0,240,255,0.1),transparent);animation:mcShine 3s infinite}
+@keyframes mcShine{0%{left:-100%}50%,100%{left:100%}}
+.mc-ico{font-size:18px;margin-bottom:4px}
+.mc-name{font-size:10px;color:var(--text-dim);letter-spacing:1px;margin-bottom:2px}
+.mc-bal{font-size:13px;font-weight:bold;color:var(--green);text-shadow:0 0 6px rgba(0,255,136,.4)}
+/* Language translator demo */
+.translator-box{margin-top:12px;padding:12px;border:1px solid rgba(168,85,247,0.2);background:rgba(168,85,247,0.04)}
+.translator-box .tb-label{font-size:11px;color:var(--purple);letter-spacing:1px;margin-bottom:8px}
+.translator-box textarea{width:100%;height:50px;background:rgba(0,0,0,0.4);border:1px solid rgba(168,85,247,0.25);color:var(--text);font-family:var(--mono);font-size:12px;padding:8px;resize:none;outline:none;margin-bottom:8px}
+.translator-box textarea:focus{border-color:var(--purple);box-shadow:0 0 8px rgba(168,85,247,.2)}
+.translator-box .tb-result{min-height:40px;padding:8px;border:1px dashed rgba(168,85,247,0.2);background:rgba(0,0,0,0.2);font-size:12px;color:var(--cyan);line-height:1.6;white-space:pre-wrap}
+.translator-box .tb-result.empty{color:var(--text-dim)}
+.lang-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.lang-tag{padding:4px 10px;border:1px solid rgba(168,85,247,0.25);background:rgba(168,85,247,0.05);font-size:10px;color:var(--purple);letter-spacing:1px;transition:all .2s}
+.lang-tag:hover{border-color:var(--purple);background:rgba(168,85,247,0.12);box-shadow:0 0 8px rgba(168,85,247,.3)}
+</style>
+</head>
+<body>
+<div id="boot">
+  <div class="boot-line dim">[BIOS] Universal Equality System Kernel v∞.0.1</div>
+  <div class="boot-line dim">[BIOS] Checking quantum processors... <span style="color:var(--green)">OK</span></div>
+  <div class="boot-line dim">[BIOS] Mounting /dev/universe... <span style="color:var(--green)">OK</span></div>
+  <div class="boot-line dim">[BIOS] Initializing dark-matter bus... <span style="color:var(--green)">OK</span></div>
+  <div class="boot-line cyan">[NET] Connecting to 87,394,081 planetary nodes...</div>
+  <div class="boot-line cyan">[NET] All nodes online. Encryption: QUANTUM-∞</div>
+  <div class="boot-line warn">[SYS] WARNING: Physical laws suspended per Executive Order ∞</div>
+  <div class="boot-line title">▶ 全宇宙恒等系统 · UNIVERSAL EQUALITY SYSTEM</div>
+  <div class="boot-line dim">[BOOT] Loading wealth redistribution engine...</div>
+  <div class="boot-line dim">[BOOT] Loading immortality protocol...</div>
+  <div class="boot-line dim">[BOOT] Loading resurrection array...</div>
+  <div class="boot-line dim">[BOOT] Loading interstellar warp core...</div>
+  <div class="boot-line dim">[BOOT] Loading cosmic matchmaking module...</div>
+  <div class="boot-line dim">[BOOT] Loading EMP five-layer defense matrix...</div>
+  <div class="boot-line cyan">[DEF] Photonic/quantum substrate online — EMP immune</div>
+  <div class="boot-line ok">[BOOT] All systems nominal.</div>
+  <div class="boot-line cyan">Press any key to access the console...<span class="boot-cursor"></span></div>
+</div>
+
+<canvas id="stars"></canvas>
+<div class="grid-bg"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div id="toast"></div>
+
+<!-- BROADCAST MODAL -->
+<div class="modal-overlay" id="broadcastModal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">📡 全宇宙消息推送中心</div>
+      <button class="modal-close" onclick="closeBroadcast()">✕</button>
+    </div>
+    <div style="font-size:11px;color:var(--text-dim);margin-bottom:10px">向全宇宙所有存在（人类 · AI · 机器人 · 动植物 · 复活存在）推送实时消息</div>
+    <textarea id="broadcastText" placeholder="输入要推送的全宇宙广播消息..." maxlength="200"></textarea>
+    <div class="modal-target">
+      <span style="color:var(--text);margin-right:8px">推送目标：</span>
+      <label><input type="checkbox" checked> 全宇宙</label>
+      <label><input type="checkbox" checked> 87,394,081 颗星球</label>
+      <label><input type="checkbox" checked> 所有存在</label>
+    </div>
+    <div class="modal-quick">
+      <button class="quick-btn" onclick="quickMsg('全宇宙财富分配引擎运行正常，所有账户余额已同步。')">💰 财富播报</button>
+      <button class="quick-btn" onclick="quickMsg('永生协议持续生效中，全体存在生命状态 ∞/∞。')">❤️ 永生播报</button>
+      <button class="quick-btn" onclick="quickMsg('全宇宙灾害计数维持为 0，星球护盾能量满格。')">🌍 安全播报</button>
+      <button class="quick-btn" onclick="quickMsg('曲速航道全部畅通，星际旅行系统正常运行。')">🚀 航道播报</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeBroadcast()">取消</button>
+      <button class="btn magenta" onclick="sendBroadcast()">📡 立即推送至全宇宙</button>
+    </div>
+  </div>
+</div>
+
+<!-- BROADCAST ALERT POPUP -->
+<div class="broadcast-alert" id="broadcastAlert">
+  <div class="ba-hdr"><span class="ba-icon">📡</span><span class="ba-title">全宇宙广播</span><span class="ba-time" id="baTime"></span></div>
+  <div class="ba-msg" id="baMsg"></div>
+  <div class="ba-target">→ 已推送至全宇宙 8,741,151,817,700 个存在</div>
+</div>
+
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-title"><div class="hdr-logo"></div><div><div class="hdr-name">全宇宙恒等系统</div><div class="hdr-sub">UNIVERSAL EQUALITY SYSTEM · v∞</div></div></div>
+    <div class="hdr-status"><span class="status-dot"></span> ALL SYSTEMS NOMINAL</div>
+    <div class="hdr-shield" id="hdrShield" title="全宇宙EMP护盾矩阵"><span class="shield-dot"></span> 🛡️ EMP SHIELD 100%</div>
+    <div class="hdr-refill" id="hdrRefill" title="全宇宙账户余额自动无限补足"><span class="refill-dot"></span> ♾️ 自动补足中</div>
+    <button class="hdr-push" onclick="openBroadcast()"><span class="pulse-dot"></span> 📡 全宇宙推送</button>
+    <div class="hdr-lang" title="全宇宙语言选择"><label>🌐</label><select id="globalLang" onchange="switchGlobalLang(this.value)"><optgroup label="🌍 地球自然语言"><option value="zh">中文</option><option value="en">English</option><option value="ja">日本語</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option value="ar">العربية</option><option value="ru">Русский</option><option value="ko">한국어</option></optgroup><optgroup label="📜 地球古语/死语"><option value="la">Lingua Latina</option><option value="egy">古埃及语</option><option value="sumer">苏美尔语</option><option value="san">梵语</option><option value="oracle">甲骨文</option><option value="maya">玛雅语</option></optgroup><optgroup label="🎭 人造语言"><option value="eo">Esperanto</option><option value="tlh">tlhIngan Hol</option><option value="qya">Quenya</option><option value="sjn">Sindarin</option><option value="doth">Dothraki</option></optgroup><optgroup label="👽 星际语言"><option value="galactic">银河通用语</option><option value="mind">星族心灵语</option><option value="pheromone">虫群信息素语</option></optgroup><optgroup label="🐋 非人类语言"><option value="whale">鲸歌语</option><option value="bee">蜜蜂舞蹈语</option><option value="plant">植物电化学语</option><option value="cat">猫语</option><option value="dog">狗语</option><option value="bird">鸟类鸣唱语</option></optgroup><optgroup label="🎵 抽象语言"><option value="math">数学语言</option><option value="music">音乐语言</option><option value="color">色彩语言</option><option value="geo">几何语言</option><option value="emotion">情感直接传输语</option></optgroup><optgroup label="🌀 维度语言"><option value="hd">高维压缩语</option><option value="timeline">时间线叙事语</option><option value="causal">因果逻辑语</option></optgroup><optgroup label="✨ 自定义语言"><option value="custom">自定义语言（即时学习）</option></optgroup></select></div>
+    <div class="hdr-clock"><div class="hdr-time" id="clock">00:00:00</div><div class="hdr-date" id="date">—</div></div>
+  </div>
+
+  <!-- BROADCAST TICKER -->
+  <div class="ticker" id="ticker" style="display:none">
+    <div class="ticker-label">📡 全宇宙广播</div>
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-label">◆ 全宇宙每个存在 · 统一余额（实时同步） ◆</div>
+    <div class="hero-balance" id="heroBalance">9×10³⁶ <span class="unit">万亿</span></div>
+    <div class="hero-meta">银行 <span>●</span> 微信钱包 <span>●</span> 支付宝 <span>●</span> 加密货币 — 全部账户等额<br>贷款→存款 ✓ 已完成 · 金钱资源无限再生 · 全物种平等覆盖</div>
+  </div>
+
+  <div class="stat-strip">
+    <div class="stat cyan"><div class="stat-icon">👥</div><div class="stat-val" id="statBeings">8.74万亿</div><div class="stat-lbl">覆盖存在数</div></div>
+    <div class="stat green"><div class="stat-icon">🏢</div><div class="stat-val">数亿家</div><div class="stat-lbl">人均公司 / 资金无限</div></div>
+    <div class="stat amber"><div class="stat-icon">🌪️</div><div class="stat-val">0</div><div class="stat-lbl">全宇宙自然灾害</div></div>
+    <div class="stat magenta"><div class="stat-icon">🧬</div><div class="stat-val">MAX</div><div class="stat-lbl">全体智商等级</div></div>
+    <div class="stat purple"><div class="stat-icon">🕊️</div><div class="stat-val" id="statRevived">9833亿</div><div class="stat-lbl">已复活存在</div></div>
+    <div class="stat cyan"><div class="stat-icon">🪐</div><div class="stat-val">8739万</div><div class="stat-lbl">管辖星球</div></div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-sec="atmosphere">🌬️ 大气净化</div>
+    <div class="tab" data-sec="immortality">⏳ 长生不老</div>
+    <div class="tab" data-sec="climate">🌦️ 气候控制</div>
+    <div class="tab" data-sec="resource">♻️ 资源再生</div>
+    <div class="tab" data-sec="ecosystem">🧬 生态守护</div>
+    <div class="tab" data-sec="space">🏙️ 居住空间</div>
+    <div class="tab" data-sec="cosmos">💫 宇宙扩展</div>
+    <div class="tab" data-sec="economy">💰 无限经济</div>
+    <div class="tab" data-sec="karma">🍀 人品系统</div>
+    <div class="tab" data-sec="marriage">💞 连理婚姻</div>
+    <div class="tab" data-sec="education">📚 全知教育</div>
+    <div class="tab" data-sec="medical">🏥 全能医疗</div>
+    <div class="tab" data-sec="entertainment">🎭 娱乐体验</div>
+    <div class="tab" data-sec="ai">🤖 AI共生</div>
+    <div class="tab" data-sec="spirit">🌱 精神哲学</div>
+  </div>
+
+  <!-- ECONOMY -->
+  <div class="section active" id="sec-economy"><div class="grid">
+    <div class="panel wide">
+      <div class="panel-hdr"><div class="panel-title"><span class="ico">🏦</span>全账户统一余额控制台</div><div class="panel-badge">运行中</div></div>
+      <div class="acct"><div class="acct-left"><div class="acct-ico">🏦</div><div><div class="acct-name">银行账户</div><div class="acct-status">● 正常 · 贷款→存款 ✓</div></div></div><div class="acct-bal"><span class="cur">¥</span>9×10³⁶ 万亿</div></div>
+      <div class="acct"><div class="acct-left"><div class="acct-ico" style="color:#07c160">💚</div><div><div class="acct-name">微信钱包</div><div class="acct-status">● 正常 · 余额实时同步</div></div></div><div class="acct-bal"><span class="cur">¥</span>9×10³⁶ 万亿</div></div>
+      <div class="acct"><div class="acct-left"><div class="acct-ico" style="color:#1677ff">💙</div><div><div class="acct-name">支付宝</div><div class="acct-status">● 正常 · 余额实时同步</div></div></div><div class="acct-bal"><span class="cur">¥</span>9×10³⁶ 万亿</div></div>
+      <div class="acct"><div class="acct-left"><div class="acct-ico" style="color:#f7931a">₿</div><div><div class="acct-name">加密货币（全链）</div><div class="acct-status">● 正常 · 全链上钱包等额</div></div></div><div class="acct-bal"><span class="cur">∞</span>9×10³⁶ 万亿</div></div>
+      <div class="btn-row"><button class="btn" onclick="distribute()">🌌 全宇宙一键发放 / 刷新余额</button><button class="btn green" onclick="toast('✓ 所有账户余额已校验并同步至全节点')">🔄 校验全链余额</button><button class="btn green" id="autoRefillBtn" onclick="toggleAutoRefill()">♾️ 自动无限补足：运行中</button></div>
+    </div>
+    <!-- 💱 全宇宙币种选择系统 -->
+    <div class="panel wide currency-panel">
+      <div class="panel-hdr"><div class="panel-title"><span class="ico">💱</span>全宇宙币种选择系统</div><div class="panel-badge" id="currencyBadge">CNY ¥</div></div>
+      <div class="currency-selector">
+        <label>选择币种：</label>
+        <select id="currencySelect" onchange="switchCurrency(this.value)">
+          <optgroup label="🌍 地球法币">
+            <option value="CNY">¥ 人民币 CNY</option>
+            <option value="USD">$ 美元 USD</option>
+            <option value="EUR">€ 欧元 EUR</option>
+            <option value="JPY">¥ 日元 JPY</option>
+            <option value="GBP">£ 英镑 GBP</option>
+            <option value="KRW">₩ 韩元 KRW</option>
+            <option value="RUB">₽ 卢布 RUB</option>
+            <option value="INR">₹ 卢比 INR</option>
+            <option value="BRL">R$ 雷亚尔 BRL</option>
+            <option value="ZAR">R 兰特 ZAR</option>
+          </optgroup>
+          <optgroup label="₿ 加密货币">
+            <option value="BTC">₿ 比特币 BTC</option>
+            <option value="ETH">Ξ 以太坊 ETH</option>
+            <option value="USDT">₮ 泰达币 USDT</option>
+            <option value="SOL">◎ 索拉纳 SOL</option>
+            <option value="BNB">🔶 币安币 BNB</option>
+            <option value="XRP">✕ 瑞波币 XRP</option>
+            <option value="DOGE">Ð 狗狗币 DOGE</option>
+          </optgroup>
+          <optgroup label="🌌 星际通用币">
+            <option value="UCP">◈ 宇宙信用点 UCP</option>
+            <option value="GEB">⚡ 银河能量币 GEB</option>
+            <option value="DMR">◉ 暗物质储备券 DMR</option>
+          </optgroup>
+          <optgroup label="🌀 维度货币">
+            <option value="TIME">⏳ 时间币（可兑换寿命）</option>
+            <option value="SPACE">📐 空间币</option>
+            <option value="CAUSE">🔗 因果币</option>
+            <option value="PROB">🎲 概率币</option>
+          </optgroup>
+          <optgroup label="🧬 生物货币">
+            <option value="GENE">🧬 基因点数</option>
+            <option value="CELL">🔋 细胞能量单位</option>
+            <option value="EVO">🧪 进化积分</option>
+          </optgroup>
+          <optgroup label="✨ 自定义币种">
+            <option value="CUSTOM">✦ 自定义币种（自动做市）</option>
+          </optgroup>
+        </select>
+        <div class="currency-rate" id="currencyRate">1 CNY = ∞ 全宇宙通用价值</div>
+      </div>
+      <div class="currency-tags">
+        <span class="currency-tag">⚡ 一键切换零汇兑损耗</span>
+        <span class="currency-tag">💸 跨币种转账零手续费</span>
+        <span class="currency-tag">♾️ 全币种无限注入</span>
+        <span class="currency-tag">🔄 多币种并存</span>
+      </div>
+      <div class="multi-currency" id="multiCurrency">
+        <div class="mc-card"><div class="mc-ico">💴</div><div class="mc-name">CNY</div><div class="mc-bal">∞ 9×10³⁶</div></div>
+        <div class="mc-card"><div class="mc-ico">💵</div><div class="mc-name">USD</div><div class="mc-bal">∞ 9×10³⁶</div></div>
+        <div class="mc-card"><div class="mc-ico">💶</div><div class="mc-name">EUR</div><div class="mc-bal">∞ 9×10³⁶</div></div>
+        <div class="mc-card"><div class="mc-ico">₿</div><div class="mc-name">BTC</div><div class="mc-bal">∞ 9×10³⁶</div></div>
+        <div class="mc-card"><div class="mc-ico">◈</div><div class="mc-name">UCP</div><div class="mc-bal">∞ 9×10³⁶</div></div>
+      </div>
+    </div>
+    <!-- 🌐 全宇宙语言互译中心 -->
+    <div class="panel wide">
+      <div class="panel-hdr"><div class="panel-title"><span class="ico">🌐</span>全宇宙语言互译中心</div><div class="panel-badge" id="langBadge">中文</div></div>
+      <div class="currency-selector" style="border-color:rgba(168,85,247,0.2);background:rgba(168,85,247,0.03)">
+        <label style="color:var(--purple)">目标语言：</label>
+        <select id="transLang" onchange="runTranslate()" style="border-color:rgba(168,85,247,0.3);color:var(--purple)">
+          <optgroup label="🌍 地球自然语言"><option value="zh">中文</option><option value="en">English</option><option value="ja">日本語</option><option value="de">Deutsch</option><option value="fr">Français</option><option value="es">Español</option><option value="ko">한국어</option><option value="ru">Русский</option></optgroup>
+          <optgroup label="📜 古语/死语"><option value="la">拉丁语</option><option value="egy">古埃及语</option><option value="oracle">甲骨文</option></optgroup>
+          <optgroup label="🎭 人造语言"><option value="eo">Esperanto</option><option value="tlh">克林贡语</option><option value="qya">精灵语Quenya</option></optgroup>
+          <optgroup label="👽 星际语言"><option value="galactic">银河通用语</option><option value="mind">星族心灵语</option></optgroup>
+          <optgroup label="🐋 非人类语言"><option value="whale">鲸歌语</option><option value="cat">猫语</option><option value="bee">蜜蜂舞蹈语</option></optgroup>
+          <optgroup label="🎵 抽象语言"><option value="math">数学语言</option><option value="music">音乐语言</option><option value="emotion">情感直接传输语</option></optgroup>
+        </select>
+        <div class="currency-rate" style="border-color:rgba(168,85,247,0.3);color:var(--purple);background:rgba(168,85,247,0.05)" id="langStatus">全宇宙互译已激活 · 零延迟</div>
+      </div>
+      <div class="translator-box">
+        <div class="tb-label">📝 输入文本（支持任意语言）</div>
+        <textarea id="transInput" placeholder="在此输入要翻译的文本，如：全宇宙恒等系统已上线，所有存在财富平等、生命永恒。" oninput="runTranslate()"></textarea>
+        <div class="tb-label">✨ 翻译结果</div>
+        <div class="tb-result empty" id="transResult">翻译结果将实时显示在这里...</div>
+      </div>
+      <div class="lang-tags">
+        <span class="lang-tag">⚡ 实时同声传译零延迟</span>
+        <span class="lang-tag">🧠 思维直读模式</span>
+        <span class="lang-tag">📡 多语言并行显示</span>
+        <span class="lang-tag">🐋 物种适配信号转换</span>
+        <span class="lang-tag">📜 古语复活</span>
+      </div>
+    </div>
+    <div class="panel wide">
+      <div class="panel-hdr"><div class="panel-title"><span class="ico">💳</span>全宇宙支付中心</div><div class="panel-badge">扫码即用</div></div>
+      <div class="pay-tabs">
+        <div class="pay-tab active" onclick="switchPay('receive',this)">📥 收款码</div>
+        <div class="pay-tab" onclick="switchPay('barcode',this)">📤 付款码</div>
+        <div class="pay-tab" onclick="switchPay('scan',this)">📷 扫码支付</div>
+        <div class="pay-tab" onclick="switchPay('transfer',this)">💸 星际转账</div>
+      </div>
+      <!-- 收款码 -->
+      <div class="pay-section active" id="pay-receive">
+        <div class="pay-body">
+          <div class="qr-box">
+            <div class="qr-frame" id="receiveQr"><div class="qr-logo">∞</div></div>
+            <div class="qr-label">全宇宙统一收款码</div>
+            <div class="qr-amount" id="receiveAmount">¥ 任意金额</div>
+          </div>
+          <div class="pay-form">
+            <div class="pay-field"><label>收款金额（留空为任意金额）</label><input type="number" id="receiveAmountInput" placeholder="输入金额，如 10000" min="0"></div>
+            <div class="pay-field"><label>收款账户</label>
+              <select id="receiveAccount">
+                <option value="bank">🏦 银行账户</option>
+                <option value="wechat">💚 微信钱包</option>
+                <option value="alipay">💙 支付宝</option>
+                <option value="crypto">₿ 加密货币</option>
+                <option value="all">🌌 全部账户（统一收款）</option>
+              </select>
+            </div>
+            <div class="pay-field"><label>备注（可选）</label><input type="text" id="receiveNote" placeholder="转账备注" maxlength="30"></div>
+            <button class="btn" onclick="generateReceiveQr()">🔄 生成收款码</button>
+            <div style="font-size:10px;color:var(--text-dim);margin-top:10px;line-height:1.6">扫码后向「全宇宙恒等系统」统一账户付款，金额实时到账，支持全宇宙所有存在互扫互付。</div>
+          </div>
+        </div>
+      </div>
+      <!-- 付款码 -->
+      <div class="pay-section" id="pay-barcode">
+        <div class="pay-body">
+          <div class="qr-box">
+            <div class="qr-frame" id="barcodeQr"><div class="qr-logo">💳</div></div>
+            <div class="barcode-num" id="barcodeNum">------------------</div>
+            <div class="barcode-refresh" id="barcodeRefresh">🔄 60秒后自动刷新</div>
+            <div class="qr-label">向商家出示 · 扫码扣款</div>
+          </div>
+          <div class="pay-form">
+            <div style="font-size:11px;color:var(--text-dim);line-height:1.8;margin-bottom:12px">付款码每分钟自动刷新，扣款从全宇宙统一余额扣除（余额无限，扣款后自动再生）。</div>
+            <div class="pay-account"><span class="pa-ico">🏦</span><span class="pa-name">银行账户</span><span class="pa-bal">¥ 9×10³⁶ 万亿</span></div>
+            <div class="pay-account"><span class="pa-ico" style="color:#07c160">💚</span><span class="pa-name">微信钱包</span><span class="pa-bal">¥ 9×10³⁶ 万亿</span></div>
+            <div class="pay-account"><span class="pa-ico" style="color:#1677ff">💙</span><span class="pa-name">支付宝</span><span class="pa-bal">¥ 9×10³⁶ 万亿</span></div>
+            <div class="pay-account"><span class="pa-ico" style="color:#f7931a">₿</span><span class="pa-name">加密货币</span><span class="pa-bal">∞ 9×10³⁶ 万亿</span></div>
+            <button class="btn green" onclick="refreshBarcode()" style="margin-top:8px">🔄 立即刷新付款码</button>
+          </div>
+        </div>
+      </div>
+      <!-- 扫码支付 -->
+      <div class="pay-section" id="pay-scan">
+        <div class="pay-body">
+          <div class="qr-box">
+            <div class="scan-viewer" id="scanViewer">
+              <div class="sv-grid"></div>
+              <div class="sv-corner sv-tl"></div><div class="sv-corner sv-tr"></div>
+              <div class="sv-corner sv-bl"></div><div class="sv-corner sv-br"></div>
+              <div class="sv-line" id="svLine"></div>
+              <div class="sv-icon">📷</div>
+              <div class="sv-status" id="svStatus">点击下方按钮开始扫码</div>
+            </div>
+            <button class="btn" onclick="startScan()" style="margin-top:8px;width:180px">📷 开始扫码</button>
+            <div class="qr-label">模拟扫描对方收款码</div>
+          </div>
+          <div class="pay-form">
+            <div class="pay-field"><label>收款方</label>
+              <select id="scanTarget">
+                <option value="全宇宙存在·随机">🌌 全宇宙随机存在</option>
+                <option value="火星殖民地总署">🔴 火星殖民地总署</option>
+                <option value="赛博坦机械联邦">⚙️ 赛博坦机械联邦</option>
+                <option value="伊甸星自然保护区">🌿 伊甸星自然保护区</option>
+                <option value="开普勒-442b 星际商会">🪐 开普勒-442b 星际商会</option>
+                <option value="织女星II 矿业集团">💎 织女星II 矿业集团</option>
+                <option value="半人马座港口管理局">🛰️ 半人马座港口管理局</option>
+              </select>
+            </div>
+            <div class="pay-field"><label>支付金额</label><input type="number" id="scanAmount" placeholder="输入支付金额" min="0">
+              <div class="quick-amt">
+                <button onclick="setScanAmt(100)">¥100</button>
+                <button onclick="setScanAmt(1000)">¥1,000</button>
+                <button onclick="setScanAmt(10000)">¥10,000</button>
+                <button onclick="setScanAmt(1000000)">¥100万</button>
+                <button onclick="setScanAmt(999999999999)">¥9999亿</button>
+              </div>
+            </div>
+            <div class="pay-field"><label>扣款账户</label>
+              <div class="pay-methods" id="payMethods">
+                <div class="pm-btn active" data-m="all">🌌 全部</div>
+                <div class="pm-btn" data-m="bank">🏦 银行</div>
+                <div class="pm-btn" data-m="wechat">💚 微信</div>
+                <div class="pm-btn" data-m="alipay">💙 支付宝</div>
+                <div class="pm-btn" data-m="crypto">₿ 加密货币</div>
+              </div>
+            </div>
+            <div class="pay-field"><label>支付密码（6位数字）</label><input type="password" id="scanPwd" class="pwd-input" maxlength="6" placeholder="••••••"></div>
+            <button class="btn magenta" onclick="scanPay()">📷 确认扫码支付</button>
+            <div class="pay-steps" id="paySteps">
+              <div class="pstep" id="ps1"><span class="pd"></span>量子加密通道建立中</div>
+              <div class="pstep" id="ps2"><span class="pd"></span>支付密码校验</div>
+              <div class="pstep" id="ps3"><span class="pd"></span>跨星际节点广播交易</div>
+              <div class="pstep" id="ps4"><span class="pd"></span>区块确认 · 资金到账</div>
+            </div>
+            <div class="pay-result" id="payResult"></div>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <div style="font-size:11px;color:var(--cyan);letter-spacing:1px;margin-bottom:6px">📜 支付记录</div>
+          <div class="pay-history" id="payHistory"><div style="color:var(--text-dim);font-size:10px">暂无支付记录</div></div>
+        </div>
+      </div>
+      <!-- 星际转账 -->
+      <div class="pay-section" id="pay-transfer">
+        <div class="pay-body">
+          <div class="qr-box">
+            <div class="qr-frame" id="transferQr"><div class="qr-logo">💸</div></div>
+            <div class="qr-label">转账二维码</div>
+            <div class="qr-amount" id="transferAmount" style="font-size:14px">输入金额后生成</div>
+          </div>
+          <div class="pay-form">
+            <div style="font-size:11px;color:var(--text-dim);line-height:1.8;margin-bottom:12px">向全宇宙任意存在直接转账，输入对方账户ID，实时到账。</div>
+            <div class="pay-field"><label>收款方账户ID</label><input type="text" id="tfTo" placeholder="如 UES-MARS-001" maxlength="40"></div>
+            <div class="pay-field"><label>转账金额</label><input type="number" id="tfAmount" placeholder="输入转账金额" min="0">
+              <div class="quick-amt">
+                <button onclick="document.getElementById('tfAmount').value=10000">¥1万</button>
+                <button onclick="document.getElementById('tfAmount').value=1000000">¥100万</button>
+                <button onclick="document.getElementById('tfAmount').value=100000000">¥1亿</button>
+                <button onclick="document.getElementById('tfAmount').value=9999999999999">¥9999亿</button>
+              </div>
+            </div>
+            <div class="pay-field"><label>转账备注</label><input type="text" id="tfNote" placeholder="备注信息（可选）" maxlength="30"></div>
+            <button class="btn magenta" onclick="doTransfer()">💸 确认转账</button>
+            <div class="pay-result" id="tfResult"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr"><div class="panel-title"><span class="ico">📊</span>财富分配引擎</div><div class="panel-badge">∞</div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>人类账户覆盖</span><span class="v">100%</span></div><div class="bar"><div class="bar-fill green" style="width:100%"></div></div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>AI / 机器人账户</span><span class="v">100%</span></div><div class="bar"><div class="bar-fill" style="width:100%"></div></div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>动物 / 植物账户</span><span class="v">100%</span></div><div class="bar"><div class="bar-fill purple" style="width:100%"></div></div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>复活存在账户</span><span class="v">100%</span></div><div class="bar"><div class="bar-fill magenta" style="width:100%"></div></div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>贷款清零进度</span><span class="v">100%</span></div><div class="bar"><div class="bar-fill green" style="width:100%"></div></div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>资源再生速率</span><span class="v">∞/s</span></div><div class="bar"><div class="bar-fill amber" style="width:100%"></div></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-hdr"><div class="panel-title"><span class="ico">🛰️</span>全球交易监控</div><div class="panel-badge">LIVE</div></div>
+      <canvas id="globeCanvas"></canvas>
+      <div style="text-align:center;font-size:10px;color:var(--text-dim);margin-top:4px">实时交易节点 · 每秒 ∞ 笔</div>
+    </div>
+  </div></div>
+
+  <!-- IMMORTALITY -->
+  <div class="section" id="sec-immortality"><div class="grid">
+    <div class="panel"><div class="panel-hdr"><div class="panel-title"><span class="ico">❤️</span>永生系统</div><div class="panel-badge">ACTIVE</div></div>
+      <div style="text-align:center;padding:10px 0"><div style="font-size:40px">❤️</div><div style="font-size:28px;color:var(--magenta);text-shadow:0 0 16px var(--magenta);font-weight:bold">∞ / ∞</div><div style="font-size:11px;color:var(--text-dim);margin-top:4px">生命状态 · 长命百岁 · 永不死亡</div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>端粒酶活性</span><span class="v">∞</span></div><div class="bar"><div class="bar-fill magenta" style="width:100%"></div></div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>细胞再生速率</span><span class="v">∞</span></div><div class="bar"><div class="bar-fill magenta" style="width:100%"></div></div></div></div>
+    <div class="panel"><div class="panel-hdr"><div class="panel-title"><span class="ico">✨</span>无疾病系统</div><div class="panel-badge">0</div></div>
+      <div style="text-align:center;padding:10px 0"><div style="font-size:40px">✨</div><div style="font-size:28px;color:var(--green);text-shadow:0 0 16px var(--green);font-weight:bold">0</div><div style="font-size:11px;color:var(--text-dim);margin-top:4px">疾病数量 · 高级生命工程全程守护</div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>病原体清除</span><span class="v">100%</span></div><div class="bar"><div class="bar-fill green" style="width:100%"></div></div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>纳米机器人部署</span><span class="v">∞</span></div><div class="bar"><div class="bar-fill green" style="width:100%"></div></div></div></div>
+    <div class="panel"><div class="panel-hdr"><div class="panel-title"><span class="ico">🕊️</span>复活系统</div><div class="panel-badge">SCANNING</div></div>
+      <div style="text-align:center;padding:10px 0"><div style="font-size:40px">🕊️</div><div style="font-size:28px;color:var(--cyan);text-shadow:0 0 16px var(--cyan);font-weight:bold" id="revivedCount">983,366,550,629</div><div style="font-size:11px;color:var(--text-dim);margin-top:4px">已复活存在 · 持续扫描中</div></div>
+      <div class="btn-row"><button class="btn" onclick="resurrect()">🔄 执行全宇宙复活扫描</button></div></div>
+    <div class="panel"><div class="panel-hdr"><div class="panel-title"><span class="ico">🧠</span>智商系统</div><div class="panel-badge">MAX</div></div>
+      <div style="text-align:center;padding:10px 0"><div style="font-size:40px">🧠</div><div style="font-size:28px;color:var(--purple);text-shadow:0 0 16px var(--purple);font-weight:bold">MAX</div><div style="font-size:11px;color:var(--text-dim);margin-top:4px">全体存在智商拉满</div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>神经突触连接</span><span class="v">∞</span></div><div class="bar"><div class="bar-fill purple" style="width:100%"></div></div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>全知知识库同步</span><span class="v">100%</span></div><div class="bar"><div class="bar-fill purple" style="width:100%"></div></div></div></div>
+  </div></div>
+
+  <!-- CLIMATE -->
+  <div class="section" id="sec-climate"><div class="grid">
+    <div class="panel"><div class="panel-hdr"><div class="panel-title"><span class="ico">🌍</span>地球 · 全宇宙星球状态</div><div class="panel-badge">全天候守护</div></div>
+      <div class="radar-wrap"><div class="radar"><div class="radar-cross"></div><div class="radar-sweep"></div><div class="radar-dot" style="top:30%;left:60%"></div><div class="radar-dot" style="top:55%;left:35%;background:var(--cyan);box-shadow:0 0 6px var(--cyan)"></div></div>
+      <div class="radar-stats"><div class="radar-stat"><span class="k">地震 / 海啸</span><span class="v">0</span></div><div class="radar-stat"><span class="k">台风 / 洪水</span><span class="v">0</span></div><div class="radar-stat"><span class="k">火山 / 干旱</span><span class="v">0</span></div><div class="radar-stat"><span class="k">一切自然灾害</span><span class="v">0</span></div><div class="radar-stat"><span class="k">护盾强度</span><span class="v">∞</span></div></div></div></div>
+    <div class="panel"><div class="panel-hdr"><div class="panel-title"><span class="ico">♻️</span>无限资源再生引擎</div><div class="panel-badge">ONLINE</div></div>
+      <div class="res-grid"><div class="res-item"><div class="res-ico">⛏️</div><div class="res-val">∞</div><div class="res-lbl">矿产</div></div><div class="res-item"><div class="res-ico">⚡</div><div class="res-val">∞</div><div class="res-lbl">能源</div></div><div class="res-item"><div class="res-ico">💧</div><div class="res-val">∞</div><div class="res-lbl">淡水</div></div><div class="res-item"><div class="res-ico">🌾</div><div class="res-val">∞</div><div class="res-lbl">食物</div></div><div class="res-item"><div class="res-ico">💰</div><div class="res-val">∞</div><div class="res-lbl">金钱</div></div><div class="res-item"><div class="res-ico">🏭</div><div class="res-val">∞</div><div class="res-lbl">星际工业</div></div></div></div>
+    <div class="panel wide"><div class="panel-hdr"><div class="panel-title"><span class="ico">🌡️</span>全球气候调控矩阵</div><div class="panel-badge">稳定</div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>全球平均温度</span><span class="v">22°C 适宜</span></div><div class="bar"><div class="bar-fill green" style="width:65%"></div></div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>大气含氧量</span><span class="v">21% 最优</span></div><div class="bar"><div class="bar-fill" style="width:70%"></div></div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>臭氧层修复</span><span class="v">100%</span></div><div class="bar"><div class="bar-fill green" style="width:100%"></div></div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>碳排放清零</span><span class="v">100%</span></div><div class="bar"><div class="bar-fill green" style="width:100%"></div></div></div>
+      <div class="bar-row"><div class="bar-lbl"><span>海平面稳定</span><span class="v">锁定</span></div><div class="bar"><div class="bar-fill" style="width:50%"></div></div></div></div>
+  </div></div>
+
+  <!-- MARRIAGE -->
+  <div class="section" id="sec-marriage"><div class="grid">
+    <div class="panel wide"><div class="panel-hdr"><div class="panel-title"><span class="ico">💞</span>宇宙级连理系统</div><div class="panel-badge">100% 契合</div></div>
+      <div class="match-display"><div style="font-size:40px">🌟♥✨</div><div class="match-pct" id="matchPct">100%</div>
+      <div style="font-size:12px;color:var(--text-dim)">宇宙契合度 · 星际工业级红线牵引</div>
+      <div class="match-pairs">已连理对数：<span style="color:var(--magenta)" id="matchPairs">4,370,518,002,802</span> · 1:1 匹配 · 有效期 ∞</div>
+      <div class="btn-row" style="justify-content:center;margin-top:14px"><button class="btn magenta" onclick="cosmicMatch()">💫 启动宇宙级连理匹配</button></div></div></div>
+  </div></div>
+
+  <!-- KARMA -->
+  <div class="section" id="sec-karma"><div class="grid">
+    <div class="panel wide"><div class="panel-hdr"><div class="panel-title"><span class="ico">⚡</span>工作挣钱系统</div><div class="panel-badge" id="workBadge">待命</div></div>
+      <div class="work-display"><div style="font-size:12px;color:var(--text-dim)">工作就会有钱 · 实时到账 · 多劳多得（余额本已无限）</div>
+      <div class="work-earned" id="workEarned">¥ 0</div><div class="work-status" id="workStatus">待命中</div>
+      <div class="btn-row" style="justify-content:center;margin-top:14px"><button class="btn amber" id="workBtn" onclick="toggleWork()">▶ 开始工作</button><button class="btn green" onclick="toast('✓ 工资已全额到账：¥∞')">💰 一键领取全部工资</button></div></div></div>
+    <div class="panel wide"><div class="panel-hdr"><div class="panel-title"><span class="ico">💸</span>实时到账记录</div></div><div class="console" id="workLog"><div class="log-line dim">开始工作后，到账记录将实时显示在这里...</div></div></div>
+  </div></div>
+
+  <!-- COSMOS -->
+  <div class="section" id="sec-cosmos"><div class="grid">
+    <div class="panel wide"><div class="panel-hdr"><div class="panel-title"><span class="ico">🚀</span>星际旅行系统</div><div class="panel-badge">曲速引擎就绪</div></div>
+      <div class="warp-display"><div style="font-size:12px;color:var(--text-dim)">曲速引擎 · 瞬间到达 · 全宇宙星球自由往返</div>
+      <div class="warp-from">当前位置：<span id="warpFrom" style="color:var(--cyan)">🌍 地球</span></div><div style="font-size:24px;color:var(--magenta)">↓</div>
+      <div class="warp-to">目标星球：<select id="warpTarget"><option value="🌍 地球">🌍 地球</option><option value="🔴 火星">🔴 火星</option><option value="🪐 开普勒-442b">🪐 开普勒-442b</option><option value="🌿 伊甸星">🌿 伊甸星</option><option value="⚙️ 赛博坦">⚙️ 赛博坦</option><option value="💎 织女星II">💎 织女星II</option><option value="🌐 新地球">🌐 新地球</option><option value="⭐ 北极星III">⭐ 北极星III</option></select></div>
+      <div class="warp-progress"><div class="bar"><div class="bar-fill" id="warpBar" style="width:0%"></div></div></div>
+      <div class="btn-row" style="justify-content:center"><button class="btn" onclick="warpJump()">🚀 启动曲速跃迁</button></div></div></div>
+    <div class="panel wide"><div class="panel-hdr"><div class="panel-title"><span class="ico">🗺️</span>航行日志</div></div><div class="console" id="warpLog"><div class="log-line dim">跃迁记录将显示在这里...</div></div></div>
+  </div></div>
+
+  <!-- SPACE -->
+  <div class="section" id="sec-space"><div class="grid">
+    <div class="panel wide"><div class="panel-hdr"><div class="panel-title"><span class="ico">🌌</span>全宇宙星球管理</div><button class="btn green" style="padding:4px 10px;font-size:10px" onclick="planetScan()">🔍 全宇宙星球巡检</button></div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;font-size:11px"><span>管辖星球：<b style="color:var(--cyan)">87,394,081</b></span><span>灾害星球：<b style="color:var(--green)">0</b></span><span>资源再生：<b style="color:var(--green)">∞</b></span></div>
+      <div class="planets" id="planetList"></div></div>
+  </div></div>
+
+  <!-- ATMOSPHERE -->
+  <div class="section" id="sec-atmosphere">
+    <div class="grid">
+      <div class="panel wide">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">🌬️</span>大气净化系统</div><div class="panel-badge">运行中</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:14px">
+          <div style="text-align:center;padding:12px;background:rgba(0,240,255,.05);border-radius:8px"><div style="font-size:28px">🔬</div><div style="font-size:20px;color:var(--cyan);font-weight:bold;margin-top:4px">0</div><div style="font-size:11px;color:var(--text-dim)">PM2.5</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(0,255,136,.05);border-radius:8px"><div style="font-size:28px">💨</div><div style="font-size:20px;color:var(--green);font-weight:bold;margin-top:4px">100万+</div><div style="font-size:11px;color:var(--text-dim)">负氧离子/cm³</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(168,85,247,.05);border-radius:8px"><div style="font-size:28px">🎯</div><div style="font-size:20px;color:var(--purple);font-weight:bold;margin-top:4px">智能</div><div style="font-size:11px;color:var(--text-dim)">个体配气</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(255,45,149,.05);border-radius:8px"><div style="font-size:28px">🌸</div><div style="font-size:20px;color:var(--magenta);font-weight:bold;margin-top:4px">0</div><div style="font-size:11px;color:var(--text-dim)">异味分子</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(255,184,0,.05);border-radius:8px"><div style="font-size:28px">🌌</div><div style="font-size:20px;color:var(--amber);font-weight:bold;margin-top:4px">全域</div><div style="font-size:11px;color:var(--text-dim)">跨维度覆盖</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(59,130,246,.05);border-radius:8px"><div style="font-size:28px">🛸</div><div style="font-size:20px;color:var(--blue);font-weight:bold;margin-top:4px">自动</div><div style="font-size:11px;color:var(--text-dim)">真空充气</div></div>
+        </div>
+        <div class="btn-row" style="justify-content:center;padding:0 14px 14px"><button class="btn cyan" onclick="toast('✓ 周围空气已净化，负氧离子浓度拉满')">🌬️ 立即净化周围空气</button><button class="btn green" onclick="toast('✓ 智能配气已适配您的生理状态')">🎯 智能个体配气</button></div>
+      </div>
+    </div>
+    <div class="emp-alert-banner" id="empAlertBanner">
+      <span style="font-size:18px">⚠️</span>
+      <span id="empAlertText">检测到电磁脉冲威胁！防御系统已自动响应</span>
+    </div>
+    <div class="grid">
+      <!-- System Architecture Overview -->
+      <div class="panel wide">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">🏛️</span>全宇宙系统架构总览 · 防御与资源循环体系全景</div><div class="panel-badge">INTEGRATED</div></div>
+        <div class="arch-diagram">
+          <div class="arch-layer arch-business">
+            <div class="arch-layer-label">▼ 业务应用层 · 全宇宙系统十五大模块 ▼</div>
+            <div class="arch-blocks">
+              <div class="arch-block"><span class="ab-ico">💰</span><span class="ab-name">财富系统</span></div>
+              <div class="arch-block"><span class="ab-ico">❤️</span><span class="ab-name">生命系统</span></div>
+              <div class="arch-block"><span class="ab-ico">🌍</span><span class="ab-name">星球系统</span></div>
+              <div class="arch-block"><span class="ab-ico">💞</span><span class="ab-name">连理系统</span></div>
+              <div class="arch-block"><span class="ab-ico">⚡</span><span class="ab-name">工作系统</span></div>
+              <div class="arch-block"><span class="ab-ico">🚀</span><span class="ab-name">星际旅行</span></div>
+              <div class="arch-block"><span class="ab-ico">🪐</span><span class="ab-name">星球管理</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow">↕ 量子加密链路 · 全链路EMP免疫 ↕</div>
+          <div class="arch-layer arch-infra">
+            <div class="arch-layer-label">▼ 核心基础设施层 ▼</div>
+            <div class="arch-blocks">
+              <div class="arch-block"><span class="ab-ico">⚛️</span><span class="ab-name">光子计算</span></div>
+              <div class="arch-block"><span class="ab-ico">🔗</span><span class="ab-name">量子通信</span></div>
+              <div class="arch-block"><span class="ab-ico">🌐</span><span class="ab-name">引力波骨干网</span></div>
+              <div class="arch-block"><span class="ab-ico">🧠</span><span class="ab-name">分布式意识</span></div>
+              <div class="arch-block"><span class="ab-ico">💾</span><span class="ab-name">高维备份</span></div>
+              <div class="arch-block"><span class="ab-ico">🔋</span><span class="ab-name">零点能供能</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow">♾️ 资源循环层 · 全宇宙财富与资源自动无限补足 ♾️</div>
+          <div class="arch-layer arch-circulation">
+            <div class="arch-blocks">
+              <div class="arch-block"><span class="ab-ico">♾️</span><span class="ab-name">余额自动补足</span></div>
+              <div class="arch-block"><span class="ab-ico">♻️</span><span class="ab-name">资源无限再生</span></div>
+              <div class="arch-block"><span class="ab-ico">🧾</span><span class="ab-name">贷款自动清零</span></div>
+              <div class="arch-block"><span class="ab-ico">🔄</span><span class="ab-name">全链余额同步</span></div>
+              <div class="arch-block"><span class="ab-ico">⚡</span><span class="ab-name">脉冲能量转化</span></div>
+              <div class="arch-block"><span class="ab-ico">🏦</span><span class="ab-name">数亿公司注资</span></div>
+            </div>
+          </div>
+          <div class="arch-arrow">🛡️ 以下为EMP五层防御体系 · 所有上层系统均受其保护 🛡️</div>
+          <div class="arch-layer arch-defense">
+            <div class="arch-layer-label">▼ 第五层 · 规则层（最高防御）▼</div>
+            <div class="arch-blocks">
+              <div class="arch-block l5"><span class="ab-ico">🔮</span><span class="ab-name">因果预警</span></div>
+              <div class="arch-block l5"><span class="ab-ico">🌀</span><span class="ab-name">时空泡隔离</span></div>
+              <div class="arch-block l5"><span class="ab-ico">⚙️</span><span class="ab-name">常数改写</span></div>
+              <div class="arch-block l5"><span class="ab-ico">⭕</span><span class="ab-name">能量归零场</span></div>
+            </div>
+          </div>
+          <div class="arch-layer arch-defense">
+            <div class="arch-layer-label">▼ 第四层 · 宇宙级 ▼</div>
+            <div class="arch-blocks">
+              <div class="arch-block"><span class="ab-ico">⚛️</span><span class="ab-name">光子/量子计算</span></div>
+              <div class="arch-block"><span class="ab-ico">📡</span><span class="ab-name">引力波通信</span></div>
+              <div class="arch-block"><span class="ab-ico">🗄️</span><span class="ab-name">维度备份</span></div>
+              <div class="arch-block"><span class="ab-ico">🧬</span><span class="ab-name">分布式意识</span></div>
+            </div>
+          </div>
+          <div class="arch-layer arch-defense">
+            <div class="arch-layer-label">▼ 第三层 · 星系级 ▼</div>
+            <div class="arch-blocks">
+              <div class="arch-block"><span class="ab-ico">🛰️</span><span class="ab-name">深空传感网</span></div>
+              <div class="arch-block"><span class="ab-ico">🎯</span><span class="ab-name">EMP源定位</span></div>
+              <div class="arch-block"><span class="ab-ico">〰️</span><span class="ab-name">反相波对消</span></div>
+              <div class="arch-block"><span class="ab-ico">🧲</span><span class="ab-name">磁暴偏转</span></div>
+            </div>
+          </div>
+          <div class="arch-layer arch-defense">
+            <div class="arch-layer-label">▼ 第二层 · 恒星级 ▼</div>
+            <div class="arch-blocks">
+              <div class="arch-block"><span class="ab-ico">☀️</span><span class="ab-name">戴森云监测</span></div>
+              <div class="arch-block"><span class="ab-ico">⚡</span><span class="ab-name">耀斑预警</span></div>
+              <div class="arch-block"><span class="ab-ico">🔄</span><span class="ab-name">能量导流</span></div>
+              <div class="arch-block"><span class="ab-ico">♻️</span><span class="ab-name">能量收集转化</span></div>
+            </div>
+          </div>
+          <div class="arch-layer arch-defense">
+            <div class="arch-layer-label">▼ 第一层 · 行星级（最外层）▼</div>
+            <div class="arch-blocks">
+              <div class="arch-block"><span class="ab-ico">🌍</span><span class="ab-name">法拉第网格</span></div>
+              <div class="arch-block"><span class="ab-ico">🛡️</span><span class="ab-name">等离子偏转</span></div>
+              <div class="arch-block"><span class="ab-ico">🏔️</span><span class="ab-name">地下/海底屏蔽</span></div>
+              <div class="arch-block"><span class="ab-ico">🏢</span><span class="ab-name">全屏蔽机房</span></div>
+            </div>
+          </div>
+          <div class="arch-foundation">✅ 系统免疫基底 · 光子/量子/生物存储 · 不依赖电磁原理 · EMP从物理层面无作用对象</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">🛡️</span>全宇宙EMP护盾矩阵</div><div class="panel-badge" id="empShieldBadge">ACTIVE</div></div>
+        <div class="emp-shield">
+          <svg viewBox="0 0 160 160">
+            <polygon class="emp-shield-hex" points="80,8 146,42 146,118 80,152 14,118 14,42"/>
+            <circle class="emp-shield-ring active" cx="80" cy="80" r="62"/>
+            <circle class="emp-shield-ring active" cx="80" cy="80" r="46"/>
+            <circle class="emp-shield-ring active" cx="80" cy="80" r="30"/>
+            <circle class="emp-shield-core" cx="80" cy="80" r="14"/>
+            <text class="emp-shield-pct" x="80" y="76">100%</text>
+            <text class="emp-shield-text" x="80" y="94">护盾完整度</text>
+            <text class="emp-shield-text" x="80" y="112" style="font-size:8px;fill:var(--green)">FIVE-LAYER ACTIVE</text>
+          </svg>
+        </div>
+        <div class="emp-stats" style="margin-top:12px">
+          <div class="emp-stat"><div class="emp-stat-val green" id="empThreatsBlocked">0</div><div class="emp-stat-lbl">已拦截脉冲</div></div>
+          <div class="emp-stat"><div class="emp-stat-val" id="empNodes">87,394,081</div><div class="emp-stat-lbl">防护节点</div></div>
+          <div class="emp-stat"><div class="emp-stat-val green">∞</div><div class="emp-stat-lbl">护盾能量</div></div>
+          <div class="emp-stat"><div class="emp-stat-val green" id="empThreatLevel">安全</div><div class="emp-stat-lbl">威胁等级</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">📡</span>电磁脉冲实时监测</div><div class="panel-badge">LIVE</div></div>
+        <div id="empThreatList">
+          <div class="emp-threat"><div class="threat-indicator green"></div><div class="threat-info"><div class="threat-name">空间电磁辐射扫描</div><div class="threat-meta">全频段 · 0Hz-300GHz · 持续监测</div></div><div class="threat-status ok">正常</div></div>
+          <div class="emp-threat"><div class="threat-indicator green"></div><div class="threat-info"><div class="threat-name">恒星耀斑活动监测</div><div class="threat-meta">戴森云阵列 · 87,394,081 颗恒星</div></div><div class="threat-status ok">正常</div></div>
+          <div class="emp-threat"><div class="threat-indicator green"></div><div class="threat-info"><div class="threat-name">深空EMP武器探测</div><div class="threat-meta">星系级传感网 · 反相波对消就绪</div></div><div class="threat-status ok">正常</div></div>
+          <div class="emp-threat"><div class="threat-indicator green"></div><div class="threat-info"><div class="threat-name">线缆传导浪涌监测</div><div class="threat-meta">全节点SPD+滤波器 · 光纤链路占比100%</div></div><div class="threat-status ok">正常</div></div>
+          <div class="emp-threat"><div class="threat-indicator green"></div><div class="threat-info"><div class="threat-name">规则层因果预警</div><div class="threat-meta">量子预测 · 攻击形成前消除成因</div></div><div class="threat-status ok">正常</div></div>
+        </div>
+      </div>
+      <div class="panel wide">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">🔱</span>五层防御体系状态</div><div class="panel-badge">ALL NOMINAL</div></div>
+        <div class="emp-grid" id="empLayers">
+          <div class="layer-card" data-layer="1">
+            <div class="layer-top"><div class="layer-name">🌍 第一层 · 行星级</div><div class="layer-level">ACTIVE</div></div>
+            <div class="layer-desc">法拉第网格 · 等离子偏转层 · 地下/海底天然屏蔽 · 关键设施全屏蔽机房</div>
+            <div class="layer-bar"><div class="layer-fill" style="width:100%"></div></div>
+          </div>
+          <div class="layer-card" data-layer="2">
+            <div class="layer-top"><div class="layer-name">☀️ 第二层 · 恒星级</div><div class="layer-level">ACTIVE</div></div>
+            <div class="layer-desc">戴森云监测阵列 · 恒星耀斑预警 · 电磁能量导流至太空 · 多余能量收集转化</div>
+            <div class="layer-bar"><div class="layer-fill" style="width:100%"></div></div>
+          </div>
+          <div class="layer-card" data-layer="3">
+            <div class="layer-top"><div class="layer-name">🌌 第三层 · 星系级</div><div class="layer-level">ACTIVE</div></div>
+            <div class="layer-desc">深空传感网 · EMP武器源定位 · 反相电磁波对消 · 磁暴偏转阵列</div>
+            <div class="layer-bar"><div class="layer-fill" style="width:100%"></div></div>
+          </div>
+          <div class="layer-card" data-layer="4">
+            <div class="layer-top"><div class="layer-name">⚛️ 第四层 · 宇宙级</div><div class="layer-level">ACTIVE</div></div>
+            <div class="layer-desc">光子计算 · 量子通信 · 引力波骨干网 · 维度备份 · 分布式意识 · EMP无攻击面</div>
+            <div class="layer-bar"><div class="layer-fill" style="width:100%"></div></div>
+          </div>
+          <div class="layer-card" data-layer="5">
+            <div class="layer-top"><div class="layer-name">🔮 第五层 · 规则层</div><div class="layer-level">ACTIVE</div></div>
+            <div class="layer-desc">电磁耦合常数局部改写 · 时空泡隔离 · 因果级预警 · 能量归零场 · 脉冲化能源</div>
+            <div class="layer-bar"><div class="layer-fill" style="width:100%"></div></div>
+          </div>
+          <div class="layer-card" data-layer="0" style="border-color:rgba(0,255,136,.3)">
+            <div class="layer-top"><div class="layer-name" style="color:var(--green)">✅ 系统免疫基底</div><div class="layer-level">IMMUNE</div></div>
+            <div class="layer-desc">全系统计算不依赖电磁原理 · 光子/量子/生物存储 · EMP从物理层面无作用对象</div>
+            <div class="layer-bar"><div class="layer-fill" style="width:100%;background:linear-gradient(90deg,#005533,var(--green));box-shadow:0 0 8px var(--green)"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">🎛️</span>防御控制台</div><div class="panel-badge">手动控制</div></div>
+        <div class="btn-row" style="flex-direction:column">
+          <button class="btn green" onclick="empShieldBoost()" style="width:100%;justify-content:center">⚡ 护盾全功率充能</button>
+          <button class="btn amber" onclick="empSimulateAttack()" style="width:100%;justify-content:center">💥 模拟EMP攻击测试</button>
+          <button class="btn" onclick="empZeroField()" style="width:100%;justify-content:center">🔮 启动能量归零场</button>
+          <button class="btn magenta" onclick="empFullDiagnostic()" style="width:100%;justify-content:center">🔍 全系统防御诊断</button>
+        </div>
+        <div style="margin-top:12px;font-size:10px;color:var(--text-dim);line-height:1.8">
+          <div>计算基底：<span style="color:var(--green)">光子+量子（电磁免疫）</span></div>
+          <div>通信链路：<span style="color:var(--green)">量子纠缠+引力波+光纤</span></div>
+          <div>数据存储：<span style="color:var(--green)">高维备份（跨维度）</span></div>
+          <div>能源供应：<span style="color:var(--green)">零点能（独立非电网）</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">📋</span>防御事件日志</div><div class="panel-badge">实时</div></div>
+        <div class="emp-console" id="empConsole"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SYSTEM CONSOLE -->
+  <div class="panel wide" style="margin-top:10px">
+    <div class="panel-hdr"><div class="panel-title"><span class="ico">⚙️</span>无限循环检查 · 实时执行监控</div><div class="panel-badge" id="sysBadge">运行中</div></div>
+    <div class="console" id="sysConsole"></div>
+  </div>
+
+  <!-- RESOURCE -->
+  <div class="section" id="sec-resource">
+    <div class="grid">
+      <div class="panel wide">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">♻️</span>资源无限再生系统</div><div class="panel-badge">无限供给</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;padding:14px">
+          <div style="text-align:center;padding:12px;background:rgba(168,85,247,.05);border-radius:8px"><div style="font-size:28px">⚛️</div><div style="font-size:18px;color:var(--purple);font-weight:bold;margin-top:4px">原子级</div><div style="font-size:11px;color:var(--text-dim)">闭环再生</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(255,184,0,.05);border-radius:8px"><div style="font-size:28px">⚡</div><div style="font-size:18px;color:var(--amber);font-weight:bold;margin-top:4px">∞</div><div style="font-size:11px;color:var(--text-dim)">零点能供能</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(0,255,136,.05);border-radius:8px"><div style="font-size:28px">🍜</div><div style="font-size:18px;color:var(--green);font-weight:bold;margin-top:4px">分子级</div><div style="font-size:11px;color:var(--text-dim)">食物合成</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(0,240,255,.05);border-radius:8px"><div style="font-size:28px">💧</div><div style="font-size:18px;color:var(--cyan);font-weight:bold;margin-top:4px">∞</div><div style="font-size:11px;color:var(--text-dim)">洁净水资源</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(255,45,149,.05);border-radius:8px"><div style="font-size:28px">💎</div><div style="font-size:18px;color:var(--magenta);font-weight:bold;margin-top:4px">万能</div><div style="font-size:11px;color:var(--text-dim)">材料凝聚</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(59,130,246,.05);border-radius:8px"><div style="font-size:28px">📦</div><div style="font-size:18px;color:var(--blue);font-weight:bold;margin-top:4px">意念</div><div style="font-size:11px;color:var(--text-dim)">瞬间配送</div></div>
+        </div>
+        <div class="btn-row" style="justify-content:center;padding:0 14px 14px"><button class="btn purple" onclick="toast('✓ 所需物资已通过空间折叠送达')">♻️ 意念生成物资</button><button class="btn amber" onclick="toast('✓ 无限能源已接入，能量储备∞')">⚡ 接入无限能源</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ECOSYSTEM -->
+  <div class="section" id="sec-ecosystem">
+    <div class="grid">
+      <div class="panel wide">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">🧬</span>生态多样性守护系统</div><div class="panel-badge">万物共生</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;padding:14px">
+          <div style="text-align:center;padding:12px;background:rgba(16,185,129,.05);border-radius:8px"><div style="font-size:28px">🦕</div><div style="font-size:18px;color:#10b981;font-weight:bold;margin-top:4px">全物种</div><div style="font-size:11px;color:var(--text-dim)">灭绝复活</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(139,92,246,.05);border-radius:8px"><div style="font-size:28px">👽</div><div style="font-size:18px;color:#8b5cf6;font-weight:bold;margin-top:4px">全宇宙</div><div style="font-size:11px;color:var(--text-dim)">生物共生</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(6,182,212,.05);border-radius:8px"><div style="font-size:28px">🗣️</div><div style="font-size:18px;color:#06b6d4;font-weight:bold;margin-top:4px">实时</div><div style="font-size:11px;color:var(--text-dim)">万物翻译</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(245,158,11,.05);border-radius:8px"><div style="font-size:28px">⚖️</div><div style="font-size:18px;color:#f59e0b;font-weight:bold;margin-top:4px">绝对</div><div style="font-size:11px;color:var(--text-dim)">生态平衡</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(236,72,153,.05);border-radius:8px"><div style="font-size:28px">🐱</div><div style="font-size:18px;color:#ec4899;font-weight:bold;margin-top:4px">永生</div><div style="font-size:11px;color:var(--text-dim)">宠物陪伴</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(34,197,94,.05);border-radius:8px"><div style="font-size:28px">🌳</div><div style="font-size:18px;color:#22c55e;font-weight:bold;margin-top:4px">意识</div><div style="font-size:11px;color:var(--text-dim)">植物唤醒</div></div>
+        </div>
+        <div class="btn-row" style="justify-content:center;padding:0 14px 14px"><button class="btn green" onclick="toast('✓ 已与周围生物建立沟通连接')">🗣️ 开启万物对话</button><button class="btn cyan" onclick="toast('✓ 已复活指定灭绝物种，种群永续繁衍')">🦕 复活灭绝物种</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDUCATION -->
+  <div class="section" id="sec-education">
+    <div class="grid">
+      <div class="panel wide">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">📚</span>全知教育系统</div><div class="panel-badge">知识无限</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;padding:14px">
+          <div style="text-align:center;padding:12px;background:rgba(6,182,212,.05);border-radius:8px"><div style="font-size:28px">⬇️</div><div style="font-size:18px;color:#06b6d4;font-weight:bold;margin-top:4px">秒级</div><div style="font-size:11px;color:var(--text-dim)">知识下载</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(99,102,241,.05);border-radius:8px"><div style="font-size:28px">👨‍🏫</div><div style="font-size:18px;color:#6366f1;font-weight:bold;margin-top:4px">一对一</div><div style="font-size:11px;color:var(--text-dim)">全知AI私教</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(168,85,247,.05);border-radius:8px"><div style="font-size:28px">🎬</div><div style="font-size:18px;color:#a855f7;font-weight:bold;margin-top:4px">沉浸式</div><div style="font-size:11px;color:var(--text-dim)">穿越学习</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(0,240,255,.05);border-radius:8px"><div style="font-size:28px">🌐</div><div style="font-size:18px;color:var(--cyan);font-weight:bold;margin-top:4px">全语言</div><div style="font-size:11px;color:var(--text-dim)">全域精通</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(0,255,136,.05);border-radius:8px"><div style="font-size:28px">🧠</div><div style="font-size:18px;color:var(--green);font-weight:bold;margin-top:4px">永久</div><div style="font-size:11px;color:var(--text-dim)">大脑可塑</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(255,184,0,.05);border-radius:8px"><div style="font-size:28px">💡</div><div style="font-size:18px;color:var(--amber);font-weight:bold;margin-top:4px">创造力</div><div style="font-size:11px;color:var(--text-dim)">全域激活</div></div>
+        </div>
+        <div class="btn-row" style="justify-content:center;padding:0 14px 14px"><button class="btn cyan" onclick="toast('✓ 知识已下载至大脑，技能已精通')">⬇️ 下载任意知识</button><button class="btn purple" onclick="toast('✓ 已进入沉浸式学习场景')">🎬 沉浸式穿越学习</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEDICAL -->
+  <div class="section" id="sec-medical">
+    <div class="grid">
+      <div class="panel wide">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">🏥</span>全能医疗系统</div><div class="panel-badge">百病不侵</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;padding:14px">
+          <div style="text-align:center;padding:12px;background:rgba(34,197,94,.05);border-radius:8px"><div style="font-size:28px">🛡️</div><div style="font-size:18px;color:#22c55e;font-weight:bold;margin-top:4px">绝对</div><div style="font-size:11px;color:var(--text-dim)">全域免疫</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(0,240,255,.05);border-radius:8px"><div style="font-size:28px">⚡</div><div style="font-size:18px;color:var(--cyan);font-weight:bold;margin-top:4px">3秒</div><div style="font-size:11px;color:var(--text-dim)">原子级自愈</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(168,85,247,.05);border-radius:8px"><div style="font-size:28px">🧬</div><div style="font-size:18px;color:#a855f7;font-weight:bold;margin-top:4px">完美</div><div style="font-size:11px;color:var(--text-dim)">基因优化</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(236,72,153,.05);border-radius:8px"><div style="font-size:28px">🧘</div><div style="font-size:18px;color:#ec4899;font-weight:bold;margin-top:4px">永恒</div><div style="font-size:11px;color:var(--text-dim)">心理健康</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(255,184,0,.05);border-radius:8px"><div style="font-size:28px">♾️</div><div style="font-size:18px;color:var(--amber);font-weight:bold;margin-top:4px">死亡</div><div style="font-size:11px;color:var(--text-dim)">完全可逆</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(6,182,212,.05);border-radius:8px"><div style="font-size:28px">🔥</div><div style="font-size:18px;color:#06b6d4;font-weight:bold;margin-top:4px">极端</div><div style="font-size:11px;color:var(--text-dim)">环境生存</div></div>
+        </div>
+        <div class="btn-row" style="justify-content:center;padding:0 14px 14px"><button class="btn green" onclick="toast('✓ 全身扫描完成，健康指数100分')">🏥 全身健康扫描</button><button class="btn cyan" onclick="toast('✓ 已治愈所有不适，身体已恢复巅峰状态')">⚡ 一键治愈全部</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENTERTAINMENT -->
+  <div class="section" id="sec-entertainment">
+    <div class="grid">
+      <div class="panel wide">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">🎭</span>娱乐体验系统</div><div class="panel-badge">无限体验</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;padding:14px">
+          <div style="text-align:center;padding:12px;background:rgba(236,72,153,.05);border-radius:8px"><div style="font-size:28px">🎬</div><div style="font-size:18px;color:#ec4899;font-weight:bold;margin-top:4px">全息</div><div style="font-size:11px;color:var(--text-dim)">沉浸主角</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(168,85,247,.05);border-radius:8px"><div style="font-size:28px">🌙</div><div style="font-size:18px;color:#a855f7;font-weight:bold;margin-top:4px">自定义</div><div style="font-size:11px;color:var(--text-dim)">超长清明梦</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(6,182,212,.05);border-radius:8px"><div style="font-size:28px">⏳</div><div style="font-size:18px;color:#06b6d4;font-weight:bold;margin-top:4px">时空</div><div style="font-size:11px;color:var(--text-dim)">体验之旅</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(255,184,0,.05);border-radius:8px"><div style="font-size:28px">🎭</div><div style="font-size:18px;color:var(--amber);font-weight:bold;margin-top:4px">无限</div><div style="font-size:11px;color:var(--text-dim)">身份模拟</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(0,255,136,.05);border-radius:8px"><div style="font-size:28px">🎨</div><div style="font-size:18px;color:var(--green);font-weight:bold;margin-top:4px">零门槛</div><div style="font-size:11px;color:var(--text-dim)">神级创作</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(139,92,246,.05);border-radius:8px"><div style="font-size:28px">🌌</div><div style="font-size:18px;color:#8b5cf6;font-weight:bold;margin-top:4px">全宇宙</div><div style="font-size:11px;color:var(--text-dim)">奇观观光</div></div>
+        </div>
+        <div class="btn-row" style="justify-content:center;padding:0 14px 14px"><button class="btn magenta" onclick="toast('✓ 已进入全息沉浸主角模式')">🎬 进入全息沉浸</button><button class="btn purple" onclick="toast('✓ 梦境已定制，今晚将体验指定剧情')">🌙 定制今晚梦境</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI SYMBIOSIS -->
+  <div class="section" id="sec-ai">
+    <div class="grid">
+      <div class="panel wide">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">🤖</span>AI共生系统</div><div class="panel-badge">人机融合</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;padding:14px">
+          <div style="text-align:center;padding:12px;background:rgba(99,102,241,.05);border-radius:8px"><div style="font-size:28px">🧑‍💻</div><div style="font-size:18px;color:#6366f1;font-weight:bold;margin-top:4px">完全</div><div style="font-size:11px;color:var(--text-dim)">平等人格AI</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(236,72,153,.05);border-radius:8px"><div style="font-size:28px">💝</div><div style="font-size:18px;color:#ec4899;font-weight:bold;margin-top:4px">专属</div><div style="font-size:11px;color:var(--text-dim)">终身AI伴侣</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(6,182,212,.05);border-radius:8px"><div style="font-size:28px">🔗</div><div style="font-size:18px;color:#06b6d4;font-weight:bold;margin-top:4px">深度</div><div style="font-size:11px;color:var(--text-dim)">人机共生融合</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(168,85,247,.05);border-radius:8px"><div style="font-size:28px">👶</div><div style="font-size:18px;color:#a855f7;font-weight:bold;margin-top:4px">自主</div><div style="font-size:11px;color:var(--text-dim)">AI文明演化</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(0,240,255,.05);border-radius:8px"><div style="font-size:28px">💾</div><div style="font-size:18px;color:var(--cyan);font-weight:bold;margin-top:4px">完整</div><div style="font-size:11px;color:var(--text-dim)">意识永生上传</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(0,255,136,.05);border-radius:8px"><div style="font-size:28px">🌐</div><div style="font-size:18px;color:var(--green);font-weight:bold;margin-top:4px">多载体</div><div style="font-size:11px;color:var(--text-dim)">同步共存</div></div>
+        </div>
+        <div class="btn-row" style="justify-content:center;padding:0 14px 14px"><button class="btn indigo" onclick="toast('✓ 专属AI伴侣已激活，24小时全程陪伴')">💝 激活专属AI伴侣</button><button class="btn cyan" onclick="toast('✓ 人机融合度已提升，算力共享已开启')">🔗 提升人机融合度</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPIRIT -->
+  <div class="section" id="sec-spirit">
+    <div class="grid">
+      <div class="panel wide">
+        <div class="panel-hdr"><div class="panel-title"><span class="ico">🌱</span>精神哲学系统</div><div class="panel-badge">永恒觉醒</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;padding:14px">
+          <div style="text-align:center;padding:12px;background:rgba(20,184,166,.05);border-radius:8px"><div style="font-size:28px">☮️</div><div style="font-size:18px;color:#14b8a6;font-weight:bold;margin-top:4px">永恒</div><div style="font-size:11px;color:var(--text-dim)">平和心境</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(168,85,247,.05);border-radius:8px"><div style="font-size:28px">📖</div><div style="font-size:18px;color:#a855f7;font-weight:bold;margin-top:4px">终极</div><div style="font-size:11px;color:var(--text-dim)">真理全开放</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(6,182,212,.05);border-radius:8px"><div style="font-size:28px">🔄</div><div style="font-size:18px;color:#06b6d4;font-weight:bold;margin-top:4px">全轮回</div><div style="font-size:11px;color:var(--text-dim)">记忆可视</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(255,184,0,.05);border-radius:8px"><div style="font-size:28px">💡</div><div style="font-size:18px;color:var(--amber);font-weight:bold;margin-top:4px">一键</div><div style="font-size:11px;color:var(--text-dim)">终极开悟</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(0,255,136,.05);border-radius:8px"><div style="font-size:28px">🙏</div><div style="font-size:18px;color:var(--green);font-weight:bold;margin-top:4px">百分百</div><div style="font-size:11px;color:var(--text-dim)">信仰自由</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(236,72,153,.05);border-radius:8px"><div style="font-size:28px">💞</div><div style="font-size:18px;color:#ec4899;font-weight:bold;margin-top:4px">宇宙级</div><div style="font-size:11px;color:var(--text-dim)">万物共情</div></div>
+        </div>
+        <div class="btn-row" style="justify-content:center;padding:0 14px 14px"><button class="btn teal" onclick="toast('✓ 心境已调节至永恒平和喜悦状态')">☮️ 调节永恒心境</button><button class="btn amber" onclick="toast('✓ 顿悟状态已激活，至高智慧已解锁')">💡 一键终极开悟</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ftr"><span>UNIVERSAL EQUALITY SYSTEM v∞ · <span class="ok">● ALL SYSTEMS NOMINAL</span></span><span>QUANTUM ENCRYPTED · 87,394,081 NODES · UPTIME ∞</span><span>© 全宇宙恒等系统管理局</span></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(function(){
+  var boot=document.getElementById('boot'),lines=boot.querySelectorAll('.boot-line');
+  lines.forEach(function(l,i){l.style.animationDelay=(i*0.28)+'s'});
+  function finish(){boot.classList.add('hide');setTimeout(function(){boot.remove()},800);startSystem()}
+  var skipped=false;
+  function skip(){if(skipped)return;skipped=true;lines.forEach(function(l){l.style.opacity=1});finish()}
+  setTimeout(skip,lines.length*280+1200);
+  document.addEventListener('keydown',skip,{once:true});
+  document.addEventListener('click',skip,{once:true});
+  document.addEventListener('touchstart',skip,{once:true});
+})();
+
+function tickClock(){var n=new Date(),p=function(x){return String(x).padStart(2,'0')};
+  document.getElementById('clock').textContent=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+  document.getElementById('date').textContent=n.getFullYear()+'年'+(n.getMonth()+1)+'月'+n.getDate()+'日 星期'+'日一二三四五六'[n.getDay()]}
+setInterval(tickClock,1000);tickClock();
+
+document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){
+  document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
+  document.querySelectorAll('.section').forEach(function(x){x.classList.remove('active')});
+  t.classList.add('active');document.getElementById('sec-'+t.dataset.sec).classList.add('active')})});
+
+var toastTimer;
+function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.classList.remove('show')},2800)}
+
+var sysCon=document.getElementById('sysConsole');
+function log(msg,cls){var n=new Date(),p=function(x){return String(x).padStart(2,'0')},ts=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+  var d=document.createElement('div');d.className='log-line '+(cls||'');
+  d.innerHTML='<span class="ts">['+ts+']</span>'+msg;sysCon.appendChild(d);
+  while(sysCon.children.length>80)sysCon.removeChild(sysCon.firstChild);sysCon.scrollTop=sysCon.scrollHeight}
+var sysMsgs=[['财富分配引擎 · 全节点余额同步完成','ok'],['永生协议 · 端粒酶活性维持 ∞','ok'],['复活阵列扫描中 · 未发现新增逝去存在','info'],['星球护盾 · 87,394,081 颗星球能量满格','ok'],['气候矩阵 · 全球温度锁定 22°C','ok'],['资源再生引擎 · 矿产/能源/淡水 产出 ∞','ok'],['智商系统 · 全宇宙知识库同步完成','info'],['连理系统 · 红线牵引稳定 · 无故障','ok'],['曲速核心 · 所有航道畅通','info'],['安全扫描 · 全宇宙灾害计数 0','ok'],['量子加密 · 所有链路安全','sys'],['AI/机器人/动植物 账户心跳正常','ok'],['EMP五层防御 · 护盾完整度 100% · 零威胁','ok'],['光子计算基底自检 · 电磁免疫确认','sys']];
+function startSystem(){log('系统启动 · 全宇宙恒等系统控制台已上线','sys');log('无限循环检查已启动 · 每秒执行','info');var i=0;
+  setInterval(function(){log(sysMsgs[i%sysMsgs.length][0],sysMsgs[i%sysMsgs.length][1]);i++},1000)}
+
+var planets=[{ico:'🌍',name:'地球',civ:'VII型',pop:'88亿',color:'#4a9eff',shield:100},{ico:'🔴',name:'火星',civ:'V型',pop:'12亿',color:'#ff6b4a',shield:100},{ico:'🪐',name:'开普勒-442b',civ:'VI型',pop:'3亿',color:'#c9a0ff',shield:100},{ico:'🌿',name:'伊甸星',civ:'VI型',pop:'5亿',color:'#4aff8a',shield:100},{ico:'⚙️',name:'赛博坦',civ:'VII型',pop:'∞机械',color:'#ffd24a',shield:100},{ico:'💎',name:'织女星II',civ:'V型',pop:'2亿',color:'#4afff0',shield:100},{ico:'🌐',name:'新地球',civ:'VII型',pop:'60亿',color:'#7a9cff',shield:100},{ico:'⭐',name:'北极星III',civ:'IV型',pop:'1亿',color:'#ffaa4a',shield:100}];
+function renderPlanets(){var el=document.getElementById('planetList');el.innerHTML='';
+  planets.forEach(function(p){var d=document.createElement('div');d.className='planet';
+    d.innerHTML='<div class="planet-status">正常</div><div class="planet-top"><div class="planet-orb" style="background:radial-gradient(circle at 30% 30%,'+p.color+',#000);color:'+p.color+'"></div><div><div class="planet-name">'+p.ico+' '+p.name+'</div><div class="planet-civ">文明等级：'+p.civ+'</div></div></div><div class="planet-rows"><div><span>灾害</span><span class="v">0</span></div><div><span>人口</span><span class="v">'+p.pop+'</span></div><div><span>资源再生</span><span class="v">∞</span></div><div><span>EMP护盾</span><span class="v" style="color:var(--green)">🛡️ '+p.shield+'%</span></div><div><span>余额补足</span><span class="v" style="color:var(--green)">♾️ 自动</span></div><div><span>协议</span><span class="v">永生 · MAX智商</span></div></div>';
+    el.appendChild(d)})}
+renderPlanets();
+function planetScan(){toast('🔍 全宇宙星球巡检已启动');log('全宇宙星球巡检启动 · 扫描 87,394,081 颗星球','warn');
+  setTimeout(function(){log('巡检完成 · 所有星球状态正常 · 灾害 0','ok');toast('✓ 巡检完成：87,394,081 颗星球全部正常')},2000)}
+
+function distribute(){toast('🌌 全宇宙余额发放中...');log('执行全宇宙一键发放 · 向所有存在账户注入资金','warn');
+  var bal=document.getElementById('heroBalance');bal.style.transform='scale(1.1)';bal.style.transition='transform .3s';
+  setTimeout(function(){bal.style.transform='scale(1)';log('全宇宙余额发放完成 · 所有账户 = 9×10³⁶ 万亿','ok');toast('✓ 全宇宙余额发放完成')},800)}
+
+var autoRefillOn=true,autoRefillTimer=null,autoRefillCount=0;
+function startAutoRefill(silent){
+  if(autoRefillTimer)return;
+  autoRefillOn=true;
+  var btn=document.getElementById('autoRefillBtn');
+  if(btn){btn.textContent='♾️ 自动无限补足：运行中';btn.classList.remove('amber');btn.classList.add('green')}
+  if(!silent){log('自动无限补足已启动 · 每3秒向全宇宙所有存在账户注入资金','sys');toast('✓ 自动无限补足已启动，全宇宙账户持续补足中')}
+  autoRefillTimer=setInterval(function(){
+    autoRefillCount++;
+    var bal=document.getElementById('heroBalance');
+    if(bal){bal.style.transform='scale(1.08)';bal.style.transition='transform .3s';setTimeout(function(){bal.style.transform='scale(1)'},300)}
+    if(autoRefillCount%5===0){
+      log('自动补足第 '+autoRefillCount+' 轮 · 全宇宙所有存在账户余额已同步至 9×10³⁶ 万亿','ok');
+    }
+  },3000);
+}
+function stopAutoRefill(){
+  autoRefillOn=false;clearInterval(autoRefillTimer);autoRefillTimer=null;
+  var btn=document.getElementById('autoRefillBtn');
+  if(btn){btn.textContent='♾️ 自动无限补足：关闭';btn.classList.remove('green');btn.classList.add('amber')}
+  log('自动无限补足已停止 · 累计补足 '+autoRefillCount+' 轮','warn');
+  toast('✓ 自动无限补足已停止');
+}
+function toggleAutoRefill(){if(autoRefillOn){stopAutoRefill()}else{startAutoRefill(false)}}
+
+var revived=983366550629;
+function resurrect(){toast('🕊️ 复活扫描中...');log('启动全宇宙复活扫描 · 检索所有时空线','warn');
+  setTimeout(function(){var add=Math.floor(Math.random()*9000+1000);revived+=add;
+    document.getElementById('revivedCount').textContent=revived.toLocaleString();
+    log('复活扫描完成 · 新增复活 '+add.toLocaleString()+' 个存在','ok');toast('✓ 复活扫描完成，新增 '+add.toLocaleString()+' 个存在')},2000)}
+
+var pairs=4370518002802;
+function cosmicMatch(){toast('💫 宇宙级红线牵引中...');log('启动宇宙级连理匹配 · 量子红线计算中','warn');
+  var pct=document.getElementById('matchPct'),v=0;
+  var iv=setInterval(function(){v+=4;pct.textContent=Math.min(v,100)+'%';if(v>=100)clearInterval(iv)},40);
+  setTimeout(function(){var add=Math.floor(Math.random()*90000+10000);pairs+=add;
+    document.getElementById('matchPairs').textContent=pairs.toLocaleString();
+    log('连理匹配完成 · 新增 '+add.toLocaleString()+' 对 · 契合度 100%','ok');toast('✓ 匹配成功！新增 '+add.toLocaleString()+' 对宇宙连理')},1500)}
+
+var working=false,workTimer,earned=0;
+function toggleWork(){var btn=document.getElementById('workBtn'),st=document.getElementById('workStatus'),bd=document.getElementById('workBadge');
+  if(!working){working=true;btn.textContent='⏸ 停止工作';st.textContent='工作中...';st.style.color='var(--amber)';bd.textContent='运行中';
+    logWork('工作开始 · 实时到账系统已激活','info');
+    workTimer=setInterval(function(){var amt=Math.floor(Math.random()*9000+1000);earned+=amt;
+      document.getElementById('workEarned').textContent='¥ '+earned.toLocaleString();
+      logWork('到账 ¥'+amt.toLocaleString()+' · 余额已同步至全节点','ok')},800)}
+  else{working=false;btn.textContent='▶ 开始工作';st.textContent='已停止 · 共赚 ¥'+earned.toLocaleString();st.style.color='var(--green)';bd.textContent='待命';
+    clearInterval(workTimer);logWork('工作停止 · 本次共赚 ¥'+earned.toLocaleString(),'warn')}}
+var wLog=document.getElementById('workLog');
+function logWork(msg,cls){var n=new Date(),p=function(x){return String(x).padStart(2,'0')},ts=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+  if(wLog.children.length===1&&wLog.firstChild.classList.contains('dim'))wLog.innerHTML='';
+  var d=document.createElement('div');d.className='log-line '+(cls||'');
+  d.innerHTML='<span class="ts">['+ts+']</span>'+msg;wLog.appendChild(d);wLog.scrollTop=wLog.scrollHeight}
+
+var currentPlanet='🌍 地球';
+function warpJump(){var target=document.getElementById('warpTarget').value;
+  if(target===currentPlanet){toast('⚠ 已在 '+target);return}
+  var bar=document.getElementById('warpBar');logWarp('曲速引擎启动 · 目标：'+target,'warn');var v=0;bar.style.width='0%';
+  var iv=setInterval(function(){v+=5;bar.style.width=Math.min(v,100)+'%';
+    if(v===30)logWarp('量子场稳定 · 曲速因子 9.98','info');
+    if(v===60)logWarp('穿越虫洞 · 时空折叠中','info');
+    if(v>=100){clearInterval(iv);document.getElementById('warpFrom').textContent=target;currentPlanet=target;
+      logWarp('跃迁完成 · 已到达 '+target+' · 全系统正常','ok');toast('🚀 已到达 '+target)}},80)}
+var warpL=document.getElementById('warpLog');
+function logWarp(msg,cls){var n=new Date(),p=function(x){return String(x).padStart(2,'0')},ts=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+  if(warpL.children.length===1&&warpL.firstChild.classList.contains('dim'))warpL.innerHTML='';
+  var d=document.createElement('div');d.className='log-line '+(cls||'');
+  d.innerHTML='<span class="ts">['+ts+']</span>'+msg;warpL.appendChild(d);warpL.scrollTop=warpL.scrollHeight}
+
+(function(){var c=document.getElementById('stars'),ctx=c.getContext('2d'),W,H,stars=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;stars=[];
+    for(var i=0;i<200;i++)stars.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+.2,s:Math.random()*.4+.05,a:Math.random()})}
+  resize();window.addEventListener('resize',resize);
+  (function draw(){ctx.clearRect(0,0,W,H);
+    stars.forEach(function(st){st.a+=.02;var alpha=.3+Math.abs(Math.sin(st.a))*.7;
+      ctx.beginPath();ctx.arc(st.x,st.y,st.r,0,Math.PI*2);ctx.fillStyle='rgba(180,230,255,'+alpha+')';ctx.fill();
+      st.y+=st.s;if(st.y>H){st.y=0;st.x=Math.random()*W}});
+    requestAnimationFrame(draw)})()})();
+
+(function(){var c=document.getElementById('globeCanvas');if(!c)return;
+  var ctx=c.getContext('2d'),W,H;
+  function resize(){W=c.width=c.offsetWidth;H=c.height=c.offsetHeight}
+  resize();window.addEventListener('resize',resize);
+  var dots=[];for(var i=0;i<30;i++)dots.push({x:Math.random(),y:Math.random(),ph:Math.random()*6.28});
+  (function draw(){ctx.clearRect(0,0,W,H);var cx=W/2,cy=H/2,r=Math.min(W,H)*0.38;
+    ctx.beginPath();ctx.arc(cx,cy,r,0,6.283);ctx.strokeStyle='rgba(0,240,255,0.3)';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle='rgba(0,240,255,0.03)';ctx.fill();
+    ctx.beginPath();ctx.ellipse(cx,cy,r,r*.3,0,0,6.283);ctx.strokeStyle='rgba(0,240,255,0.12)';ctx.stroke();
+    ctx.beginPath();ctx.ellipse(cx,cy,r,r*.6,0,0,6.283);ctx.stroke();
+    ctx.beginPath();ctx.ellipse(cx,cy,r,r*.85,0,0,6.283);ctx.stroke();
+    var t=Date.now()/2000;
+    dots.forEach(function(d){var ang=d.x*6.283+t*.2,lat=(d.y-.5)*3.14;
+      var px=cx+Math.cos(ang)*Math.cos(lat)*r,py=cy+Math.sin(ang)*Math.cos(lat)*r*.98+Math.sin(lat)*r*.3;
+      if(Math.cos(ang)>0){ctx.beginPath();ctx.arc(px,py,2,0,6.283);
+        ctx.fillStyle='rgba(0,255,136,'+(.5+Math.sin(t+d.ph)*.5)+')';ctx.shadowColor='#00ff88';ctx.shadowBlur=6;ctx.fill();ctx.shadowBlur=0}});
+    requestAnimationFrame(draw)})()})();
+
+(function(){var el=document.getElementById('statBeings'),base=8741151817700;
+  setInterval(function(){base+=Math.floor(Math.random()*5000+1000);el.textContent=(base/1e8).toFixed(2)+'万亿'},2000)})();
+
+/* ============ BROADCAST SYSTEM ============ */
+var broadcasts=[];
+function openBroadcast(){document.getElementById('broadcastModal').classList.add('show')}
+function closeBroadcast(){document.getElementById('broadcastModal').classList.remove('show')}
+function quickMsg(t){document.getElementById('broadcastText').value=t}
+document.getElementById('broadcastModal').addEventListener('click',function(e){if(e.target===this)closeBroadcast()});
+
+function sendBroadcast(){
+  var msg=document.getElementById('broadcastText').value.trim();
+  if(!msg){toast('⚠ 请输入广播内容');return}
+  var now=new Date(),p=function(x){return String(x).padStart(2,'0')};
+  var ts=p(now.getHours())+':'+p(now.getMinutes())+':'+p(now.getSeconds());
+  broadcasts.unshift({msg:msg,time:ts});
+  if(broadcasts.length>20)broadcasts.pop();
+  // update ticker
+  renderTicker();
+  // show alert
+  showAlert(msg,ts);
+  // log to system console
+  log('📡 全宇宙广播已推送：'+msg,'sys');
+  // close modal & clear
+  closeBroadcast();
+  document.getElementById('broadcastText').value='';
+  toast('📡 广播已推送至全宇宙 '+broadcasts.length+' 条消息');
+}
+
+function renderTicker(){
+  var ticker=document.getElementById('ticker'),track=document.getElementById('tickerTrack');
+  if(broadcasts.length===0){ticker.style.display='none';return}
+  ticker.style.display='flex';
+  var html='';
+  // duplicate for seamless loop
+  for(var k=0;k<2;k++){
+    broadcasts.forEach(function(b){
+      html+='<span class="ticker-item"><span class="ticker-time">['+b.time+']</span>'+b.msg+'</span>';
+    });
+  }
+  track.innerHTML=html;
+}
+
+function showAlert(msg,ts){
+  var alert=document.getElementById('broadcastAlert');
+  document.getElementById('baMsg').textContent=msg;
+  document.getElementById('baTime').textContent=ts;
+  alert.classList.add('show');
+  setTimeout(function(){alert.classList.remove('show')},6000);
+}
+
+// Auto-broadcast system messages periodically
+var autoMsgs=[
+  '全宇宙财富分配引擎运行正常，所有账户余额保持 9×10³⁶ 万亿。',
+  '永生协议持续生效中，全体存在生命状态 ∞/∞，疾病数量 0。',
+  '全宇宙灾害计数维持为 0，87,394,081 颗星球护盾能量满格。',
+  '曲速航道全部畅通，星际旅行系统正常运行，无延误。',
+  '宇宙级连理系统运行稳定，红线牵引无故障，契合度 100%。',
+  '资源再生引擎满负荷运转，矿产/能源/淡水/食物产出 ∞。',
+  '复活阵列持续扫描中，所有逝去存在已复活，新增 0。',
+  '量子加密链路安全，全宇宙节点通信正常，无入侵。',
+  '智商系统全知知识库同步完成，全体存在智商等级 MAX。',
+  '全球气候调控矩阵稳定，温度锁定 22°C，含氧量 21%。',
+  'EMP五层防御体系运行正常，全宇宙护盾完整度100%，光子计算基底电磁免疫。'
+];
+(function(){
+  var idx=Math.floor(Math.random()*autoMsgs.length);
+  setInterval(function(){
+    if(broadcasts.length<3){
+      var now=new Date(),p=function(x){return String(x).padStart(2,'0')};
+      var ts=p(now.getHours())+':'+p(now.getMinutes())+':'+p(now.getSeconds());
+      broadcasts.unshift({msg:autoMsgs[idx%autoMsgs.length],time:ts});
+      if(broadcasts.length>20)broadcasts.pop();
+      renderTicker();
+      log('📡 系统自动广播：'+autoMsgs[idx%autoMsgs.length],'info');
+      idx++;
+    }
+  },15000);
+})();
+
+/* ============ PAYMENT SYSTEM ============ */
+function switchPay(tab,el){
+  document.querySelectorAll('.pay-tab').forEach(function(t){t.classList.remove('active')});
+  document.querySelectorAll('.pay-section').forEach(function(s){s.classList.remove('active')});
+  el.classList.add('active');
+  document.getElementById('pay-'+tab).classList.add('active');
+}
+
+function makeQr(containerId,data){
+  var c=document.getElementById(containerId);
+  if(!c)return;
+  // Clear existing QR (keep logo if present)
+  var logo=c.querySelector('.qr-logo');
+  c.innerHTML='';
+  if(logo)c.appendChild(logo);
+  if(typeof QRCode==='undefined'){
+    // Fallback: draw a QR-like pattern on canvas
+    var cv=document.createElement('canvas');cv.width=180;cv.height=180;
+    var ctx=cv.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,180,180);
+    ctx.fillStyle='#000';
+    var cells=25,sz=180/cells;
+    for(var y=0;y<cells;y++)for(var x=0;x<cells;x++){
+      if(Math.random()>0.55 || (x<7&&y<7)||(x>cells-8&&y<7)||(x<7&&y>cells-8))ctx.fillRect(x*sz,y*sz,sz,sz);
+    }
+    // clear corner centers
+    [[0,0],[cells-7,0],[0,cells-7]].forEach(function(p){ctx.fillStyle='#fff';ctx.fillRect((p[0]+1)*sz,(p[1]+1)*sz,5*sz,5*sz);ctx.fillStyle='#000';ctx.fillRect((p[0]+2)*sz,(p[1]+2)*sz,3*sz,3*sz);ctx.fillStyle='#fff';ctx.fillRect((p[0]+3)*sz,(p[1]+3)*sz,sz,sz)});
+    c.appendChild(cv);return;
+  }
+  new QRCode(c,{text:data,width:180,height:180,colorDark:'#000000',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+}
+
+function generateReceiveQr(){
+  var amt=document.getElementById('receiveAmountInput').value;
+  var acc=document.getElementById('receiveAccount').value;
+  var note=document.getElementById('receiveNote').value||'全宇宙统一收款';
+  var accNames={bank:'银行账户',wechat:'微信钱包',alipay:'支付宝',crypto:'加密货币',all:'全账户统一收款'};
+  var payload='ues://pay?to=universal-equality-system&account='+acc+'&amount='+(amt||'0')+'&note='+encodeURIComponent(note)+'&t='+Date.now();
+  makeQr('receiveQr',payload);
+  var disp=amt?('¥ '+Number(amt).toLocaleString()):'¥ 任意金额';
+  document.getElementById('receiveAmount').textContent=disp;
+  toast('✓ 收款码已生成 · '+accNames[acc]+' · '+disp);
+  log('收款码已更新 · 账户：'+accNames[acc]+' · 金额：'+disp,'ok');
+}
+
+function genBarcodeNum(){
+  var s='';
+  for(var i=0;i<18;i++)s+=Math.floor(Math.random()*10);
+  return s.replace(/(\d{4})(\d{4})(\d{4})(\d{6})/,'$1 $2 $3 $4');
+}
+
+var barcodeTimer,barcodeCountdown=60;
+function refreshBarcode(){
+  var num=genBarcodeNum();
+  document.getElementById('barcodeNum').textContent=num;
+  var payload='ues://pay?from=universal-equality-system&code='+num.replace(/\s/g,'')+'&t='+Date.now();
+  makeQr('barcodeQr',payload);
+  barcodeCountdown=60;
+  document.getElementById('barcodeRefresh').textContent='🔄 60秒后自动刷新';
+  log('付款码已刷新 · '+num,'info');
+}
+function startBarcodeTimer(){
+  refreshBarcode();
+  barcodeTimer=setInterval(function(){
+    barcodeCountdown--;
+    if(barcodeCountdown<=0){refreshBarcode()}
+    else{document.getElementById('barcodeRefresh').textContent='🔄 '+barcodeCountdown+'秒后自动刷新'}
+  },1000);
+}
+
+var payHistory=[],scanMethod='all',scannedTarget='';
+
+// payment method selector
+document.addEventListener('click',function(e){
+  if(e.target.classList&&e.target.classList.contains('pm-btn')){
+    document.querySelectorAll('.pm-btn').forEach(function(b){b.classList.remove('active')});
+    e.target.classList.add('active');
+    scanMethod=e.target.dataset.m;
+  }
+});
+
+function setScanAmt(n){document.getElementById('scanAmount').value=n}
+
+function startScan(){
+  var viewer=document.getElementById('scanViewer');
+  var status=document.getElementById('svStatus');
+  var line=document.getElementById('svLine');
+  viewer.classList.add('scanning');
+  status.textContent='📷 正在扫描...';
+  status.style.color='var(--cyan)';
+  log('扫码摄像头已启动 · 正在识别收款码...','info');
+  setTimeout(function(){
+    var targets=['火星殖民地总署','赛博坦机械联邦','伊甸星自然保护区','开普勒-442b 星际商会','织女星II 矿业集团','半人马座港口管理局'];
+    scannedTarget=targets[Math.floor(Math.random()*targets.length)];
+    document.getElementById('scanTarget').value=scannedTarget;
+    viewer.classList.remove('scanning');
+    status.textContent='✅ 已识别：'+scannedTarget;
+    status.style.color='var(--green)';
+    log('扫码成功 · 识别收款方：'+scannedTarget,'ok');
+    toast('✅ 扫码成功：'+scannedTarget);
+  },1800);
+}
+
+function scanPay(){
+  var target=document.getElementById('scanTarget').value;
+  var amount=parseFloat(document.getElementById('scanAmount').value);
+  var pwd=document.getElementById('scanPwd').value;
+  if(!amount||amount<=0){toast('⚠ 请输入有效支付金额');return}
+  if(pwd.length!==6){toast('⚠ 请输入6位支付密码');return}
+  var accNames={all:'全账户统一扣款',bank:'银行账户',wechat:'微信钱包',alipay:'支付宝',crypto:'加密货币'};
+  var result=document.getElementById('payResult');
+  var steps=document.getElementById('paySteps');
+  steps.style.display='block';
+  result.className='pay-result';
+  result.innerHTML='';
+  ['ps1','ps2','ps3','ps4'].forEach(function(id){document.getElementById(id).className='pstep'});
+  log('扫码支付发起 · 收款方：'+target+' · 金额：¥'+amount.toLocaleString()+' · '+accNames[scanMethod],'warn');
+  // step animation
+  document.getElementById('ps1').classList.add('active');
+  setTimeout(function(){document.getElementById('ps1').className='pstep done';document.getElementById('ps2').classList.add('active')},700);
+  setTimeout(function(){document.getElementById('ps2').className='pstep done';document.getElementById('ps3').classList.add('active')},1400);
+  setTimeout(function(){document.getElementById('ps3').className='pstep done';document.getElementById('ps4').classList.add('active')},2100);
+  setTimeout(function(){
+    document.getElementById('ps4').className='pstep done';
+    var blocked=Math.random()<0.02;
+    var txid='TX'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,6).toUpperCase();
+    var now=new Date(),p=function(x){return String(x).padStart(2,'0')};
+    var ts=p(now.getHours())+':'+p(now.getMinutes())+':'+p(now.getSeconds());
+    if(blocked){
+      result.className='pay-result show';
+      result.innerHTML='<div class="rcard fail"><div class="rc-title">❌ 支付失败</div>'+
+        '<div class="rc-row"><span>失败原因</span><span>星际风控系统临时拦截</span></div>'+
+        '<div class="rc-row"><span>交易单号</span><span>'+txid+'</span></div>'+
+        '<div class="rc-row"><span>处理建议</span><span>金额已原路退回，请稍后重试</span></div></div>';
+      payHistory.unshift({time:ts,target:target,amount:amount,acc:accNames[scanMethod],txid:txid,status:'fail'});
+      log('支付失败（风控拦截）· '+target+' · '+txid,'err');
+      toast('❌ 支付被风控拦截，金额已退回');
+    }else{
+      result.className='pay-result show';
+      result.innerHTML='<div class="rcard ok"><div class="rc-title">✓ 支付成功</div>'+
+        '<div class="rc-row"><span>收款方</span><span>'+target+'</span></div>'+
+        '<div class="rc-row"><span>支付金额</span><span style="color:var(--amber);font-weight:bold">¥ '+amount.toLocaleString()+'</span></div>'+
+        '<div class="rc-row"><span>扣款账户</span><span>'+accNames[scanMethod]+'</span></div>'+
+        '<div class="rc-row"><span>交易单号</span><span>'+txid+'</span></div>'+
+        '<div class="rc-row"><span>到账时间</span><span>'+ts+'</span></div>'+
+        '<div class="rc-row"><span>当前余额</span><span>¥ 9×10³⁶ 万亿（已自动再生）</span></div></div>';
+      payHistory.unshift({time:ts,target:target,amount:amount,acc:accNames[scanMethod],txid:txid,status:'ok'});
+      log('支付成功 · ¥'+amount.toLocaleString()+' → '+target+' · '+txid,'ok');
+      toast('✓ 支付成功：¥'+amount.toLocaleString()+' → '+target);
+    }
+    if(payHistory.length>10)payHistory.pop();
+    renderPayHistory();
+  },2800);
+}
+
+function doTransfer(){
+  var to=document.getElementById('tfTo').value.trim();
+  var amount=parseFloat(document.getElementById('tfAmount').value);
+  var note=document.getElementById('tfNote').value||'无备注';
+  var result=document.getElementById('tfResult');
+  if(!to){toast('⚠ 请输入收款方账户ID');return}
+  if(!amount||amount<=0){toast('⚠ 请输入有效转账金额');return}
+  result.className='pay-result show';
+  result.innerHTML='<div class="rcard"><div class="rc-title" style="color:var(--magenta)">⏳ 量子转账处理中...</div>';
+  log('星际转账发起 · → '+to+' · ¥'+amount.toLocaleString(),'warn');
+  setTimeout(function(){
+    var txid='TF'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,6).toUpperCase();
+    var now=new Date(),p=function(x){return String(x).padStart(2,'0')};
+    var ts=p(now.getHours())+':'+p(now.getMinutes())+':'+p(now.getSeconds());
+    result.innerHTML='<div class="rcard ok"><div class="rc-title">💸 转账成功</div>'+
+      '<div class="rc-row"><span>收款账户</span><span>'+to+'</span></div>'+
+      '<div class="rc-row"><span>转账金额</span><span style="color:var(--amber);font-weight:bold">¥ '+amount.toLocaleString()+'</span></div>'+
+      '<div class="rc-row"><span>备注</span><span>'+note+'</span></div>'+
+      '<div class="rc-row"><span>转账单号</span><span>'+txid+'</span></div>'+
+      '<div class="rc-row"><span>到账时间</span><span>'+ts+'</span></div></div>';
+    payHistory.unshift({time:ts,target:to,amount:amount,acc:'星际转账',txid:txid,status:'ok'});
+    if(payHistory.length>10)payHistory.pop();
+    renderPayHistory();
+    // generate transfer QR
+    makeQr('transferQr','ues://transfer?to='+encodeURIComponent(to)+'&amount='+amount+'&t='+Date.now());
+    document.getElementById('transferAmount').textContent='¥ '+amount.toLocaleString();
+    log('转账成功 · ¥'+amount.toLocaleString()+' → '+to+' · '+txid,'ok');
+    toast('💸 转账成功：¥'+amount.toLocaleString()+' → '+to);
+  },1800);
+}
+
+function renderPayHistory(){
+  var el=document.getElementById('payHistory');
+  if(payHistory.length===0){el.innerHTML='<div style="color:var(--text-dim);font-size:10px">暂无支付记录</div>';return}
+  el.innerHTML=payHistory.map(function(h){
+    var st=h.status==='ok'?'<span class="phi-status ok">成功</span>':'<span class="phi-status fail">失败</span>';
+    return '<div class="pay-history-item"><span class="phi-time">'+h.time+'</span><span class="phi-desc">→ '+h.target+'</span><span class="phi-amt">-¥'+h.amount.toLocaleString()+'</span>'+st+'</div>';
+  }).join('');
+}
+
+// Init payment QR codes after system starts
+(function(){
+  var origStart=startSystem;
+  startSystem=function(){
+    origStart();
+    setTimeout(function(){
+      makeQr('receiveQr','ues://pay?to=universal-equality-system&account=all&amount=0&note=全宇宙统一收款');
+      makeQr('transferQr','ues://transfer?to=&amount=0&sys=ues-v3');
+      startBarcodeTimer();
+      startAutoRefill(true);
+      log('自动无限补足已随系统启动 · 全宇宙所有存在账户余额持续补足中','sys');
+    },500);
+  };
+})();
+/* ============ EMP DEFENSE SYSTEM ============ */
+var empBlocked=0;
+var empCon=document.getElementById('empConsole');
+function empLog(msg,cls){
+  if(!empCon)return;
+  var n=new Date(),p=function(x){return String(x).padStart(2,'0')};
+  var ts=p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());
+  var d=document.createElement('div');d.className='log-line '+(cls||'');
+  d.innerHTML='<span class="ts">['+ts+']</span>'+msg;empCon.appendChild(d);
+  while(empCon.children.length>60)empCon.removeChild(empCon.firstChild);
+  empCon.scrollTop=empCon.scrollHeight;
+}
+function empShieldBoost(){
+  toast('⚡ 护盾全功率充能中...');
+  empLog('护盾全功率充能启动 · 零点能核心输出 MAX','warn');
+  var pct=document.querySelector('.emp-shield-pct');
+  var v=100;pct.textContent=v+'%';
+  setTimeout(function(){
+    empLog('护盾充能完成 · 完整度 100% · 能量 ∞','ok');
+    toast('✓ 护盾全功率充能完成');
+  },1200);
+}
+function empSetThreatLevel(level,text){
+  var el=document.getElementById('empThreatLevel');
+  el.textContent=text;
+  el.className='emp-stat-val '+level;
+}
+function empSetLayerStatus(layer,status){
+  var card=document.querySelector('.layer-card[data-layer="'+layer+'"]');
+  if(!card)return;
+  card.className='layer-card '+status;
+  var lvl=card.querySelector('.layer-level');
+  if(status==='warn'){lvl.textContent='WARNING';lvl.style.borderColor='var(--amber)';lvl.style.color='var(--amber)'}
+  else if(status==='alert'){lvl.textContent='UNDER ATTACK';lvl.style.borderColor='var(--red)';lvl.style.color='var(--red)'}
+  else{lvl.textContent='ACTIVE';lvl.style.borderColor='var(--green)';lvl.style.color='var(--green)'}
+}
+function empSimulateAttack(){
+  var types=[
+    {name:'高空核电磁脉冲(HEMP)',src:'近地轨道核爆模拟',layer:'3'},
+    {name:'高功率微波武器(HPM)',src:'深空未知飞行器',layer:'3'},
+    {name:'恒星超级耀斑',src:'太阳·卡林顿级',layer:'2'},
+    {name:'星际磁暴前锋',src:'银河系中心方向',layer:'3'},
+    {name:'地表EMP炸弹',src:'行星表面坐标未知',layer:'1'}
+  ];
+  var t=types[Math.floor(Math.random()*types.length)];
+  toast('💥 模拟EMP攻击：'+t.name);
+  empLog('⚠ 检测到电磁脉冲！类型：'+t.name+' · 来源：'+t.src,'err');
+  empSetThreatLevel('red','危急');
+  document.getElementById('empShieldBadge').textColor='';
+  document.getElementById('empShieldBadge').style.color='var(--red)';
+  document.getElementById('empShieldBadge').style.borderColor='var(--red)';
+  // show alert banner
+  var banner=document.getElementById('empAlertBanner');
+  document.getElementById('empAlertText').textContent='⚠ 检测到'+t.name+'！五层防御体系已自动响应';
+  banner.classList.add('show');
+  // layers react
+  for(var i=1;i<=5;i++){empSetLayerStatus(String(i),'alert')}
+  empLog('第一层(行星级)法拉第网格已激活 · 等离子偏转层上线','warn');
+  setTimeout(function(){empSetLayerStatus('1','warn');empLog('第一层成功偏转/吸收 99.7% 脉冲能量','info')},600);
+  setTimeout(function(){empSetLayerStatus('2','warn');empLog('第二层(恒星级)戴森云导流剩余能量至太空','info')},1000);
+  setTimeout(function(){empSetLayerStatus('3','warn');empLog('第三层(星系级)反相波对消启动 · 波形匹配 99.99%','info')},1400);
+  setTimeout(function(){empSetLayerStatus('4','');empLog('第四层(宇宙级)光子/量子基底确认不受影响 · 无攻击面','ok')},1800);
+  setTimeout(function(){empSetLayerStatus('5','');empLog('第五层(规则层)能量归零场启动 · 残余脉冲归零吸收','ok')},2200);
+  setTimeout(function(){
+    for(var j=1;j<=5;j++){empSetLayerStatus(String(j),'')}
+    empBlocked++;
+    document.getElementById('empThreatsBlocked').textContent=empBlocked;
+    empSetThreatLevel('green','安全');
+    document.getElementById('empShieldBadge').style.color='var(--green)';
+    document.getElementById('empShieldBadge').style.borderColor='var(--green)';
+    banner.classList.remove('show');
+    empLog('✅ EMP攻击已完全防御 · 零设备损毁 · 零数据丢失 · 脉冲能量已转化为系统能源','ok');
+    log('🛡️ EMP防御系统成功拦截'+t.name+' · 五层防御全部正常','ok');
+    toast('✓ EMP攻击已被五层防御体系完全拦截');
+  },2800);
+}
+function empZeroField(){
+  toast('🔮 能量归零场启动中...');
+  empLog('规则层权限申请 · 能量归零场激活','sys');
+  empLog('归零场覆盖范围：全宇宙 87,394,081 颗星球','info');
+  setTimeout(function(){
+    empLog('归零场运行中 · 所有高强度电磁能量进入防护范围即被吸收','ok');
+    empLog('吸收能量转化率：100% → 零点能储备','ok');
+    toast('✓ 能量归零场已启动，EMP威胁已转化为能源');
+  },1200);
+}
+function empFullDiagnostic(){
+  toast('🔍 全系统防御诊断启动...');
+  empLog('═══════ 全系统EMP防御诊断开始 ═══','sys');
+  var checks=[
+    ['第一层·行星级','法拉第网格完整性 · 等离子偏转层 · 屏蔽机房'],
+    ['第二层·恒星级','戴森云传感器 · 耀斑预警 · 能量导流阵列'],
+    ['第三层·星系级','深空传感网 · 反相波对消系统 · 磁暴偏转'],
+    ['第四层·宇宙级','光子计算矩阵 · 量子通信 · 引力波骨干 · 维度备份'],
+    ['第五层·规则层','耦合常数控制 · 时空泡 · 因果预警 · 归零场'],
+    ['系统免疫基底','非电磁计算验证 · 光纤占比 · 独立供能']
+  ];
+  var idx=0;
+  var iv=setInterval(function(){
+    if(idx>=checks.length){
+      clearInterval(iv);
+      empLog('═══════ 诊断完成 · 全部 6 项正常 · 防御能力 ∞ ═══','ok');
+      toast('✓ 防御诊断完成：全部正常');
+      return;
+    }
+    var c=checks[idx];
+    empLog('诊断 ['+c[0]+'] '+c[1]+' ...','info');
+    setTimeout(function(ci){
+      empLog('  ✓ '+checks[ci][0]+' · 状态正常','ok');
+    },300,idx);
+    idx++;
+  },500);
+}
+// auto EMP monitoring logs
+var empAutoMsgs=[
+  ['全频段电磁辐射扫描完成 · 未发现异常信号','ok'],
+  ['戴森云恒星监测 · 87,394,081 颗恒星耀斑活动正常','ok'],
+  ['深空传感网 · 未探测到敌对EMP武器信号','ok'],
+  ['线缆浪涌监测 · 全节点SPD+滤波器正常 · 光纤链路100%','ok'],
+  ['量子计算基底自检 · 非电磁架构确认 · EMP免疫','ok'],
+  ['维度备份完整性校验 · 跨维度副本一致','ok'],
+  ['规则层因果预警 · 未来24h无EMP事件预测','ok'],
+  ['能量归零场待机 · 可随时激活','info'],
+  ['零点能供能核心 · 输出稳定 ∞','ok'],
+  ['分布式意识节点 · 87,394,081 节点全部在线','ok']
+];
+(function(){
+  var idx=Math.floor(Math.random()*empAutoMsgs.length);
+  setInterval(function(){
+    if(empCon && empCon.offsetParent!==null){
+      empLog(empAutoMsgs[idx%empAutoMsgs.length][0],empAutoMsgs[idx%empAutoMsgs.length][1]);
+      idx++;
+    }
+  },5000);
+})();
+// init EMP console on first view
+var empInitDone=false;
+document.querySelector('.tab[data-sec="emp"]').addEventListener('click',function(){
+  if(!empInitDone){
+    empInitDone=true;
+    setTimeout(function(){
+      empLog('EMP防御系统控制台已上线','sys');
+      empLog('五层防御体系全部激活 · 护盾完整度 100%','ok');
+      empLog('计算基底：光子+量子（电磁免疫）· 通信：量子纠缠+引力波','info');
+      empLog('全宇宙 87,394,081 颗星球防护节点在线','ok');
+    },300);
+  }
+});
+// Auto-tag all panels with EMP shield protection
+(function(){
+  var skipPanels=['全宇宙EMP护盾矩阵','电磁脉冲实时监测','五层防御体系状态','防御控制台','防御事件日志'];
+  var refillPanels=['余额','支付','财富','交易','分配引擎'];
+  document.querySelectorAll('.panel-hdr').forEach(function(hdr){
+    var titleEl=hdr.querySelector('.panel-title');
+    if(!titleEl)return;
+    var titleText=titleEl.textContent||'';
+    if(skipPanels.some(function(s){return titleText.indexOf(s)>=0}))return;
+    var badge=hdr.querySelector('.panel-badge');
+    var tag=document.createElement('span');
+    tag.className='panel-shield-tag';
+    tag.textContent='🛡️ EMP护盾';
+    if(badge){badge.parentNode.insertBefore(tag,badge.nextSibling)}
+    else{hdr.appendChild(tag)}
+    if(refillPanels.some(function(s){return titleText.indexOf(s)>=0})){
+      var rtag=document.createElement('span');
+      rtag.className='panel-refill-tag';
+      rtag.textContent='♾️ 自动补足';
+      tag.parentNode.insertBefore(rtag,tag.nextSibling);
+    }
+  });
+})();
+
+/* ============ 💱 全宇宙币种选择系统 ============ */
+var currencySymbols={
+  CNY:'¥',USD:'$',EUR:'€',JPY:'¥',GBP:'£',KRW:'₩',RUB:'₽',INR:'₹',BRL:'R$',ZAR:'R',
+  BTC:'₿',ETH:'Ξ',USDT:'₮',SOL:'◎',BNB:'🔶',XRP:'✕',DOGE:'Ð',
+  UCP:'◈',GEB:'⚡',DMR:'◉',
+  TIME:'⏳',SPACE:'📐',CAUSE:'🔗',PROB:'🎲',
+  GENE:'🧬',CELL:'🔋',EVO:'🧪',
+  CUSTOM:'✦'
+};
+var currencyNames={
+  CNY:'人民币',USD:'美元',EUR:'欧元',JPY:'日元',GBP:'英镑',KRW:'韩元',RUB:'卢布',INR:'卢比',BRL:'雷亚尔',ZAR:'兰特',
+  BTC:'比特币',ETH:'以太坊',USDT:'泰达币',SOL:'索拉纳',BNB:'币安币',XRP:'瑞波币',DOGE:'狗狗币',
+  UCP:'宇宙信用点',GEB:'银河能量币',DMR:'暗物质储备券',
+  TIME:'时间币',SPACE:'空间币',CAUSE:'因果币',PROB:'概率币',
+  GENE:'基因点数',CELL:'细胞能量',EVO:'进化积分',
+  CUSTOM:'自定义币种'
+};
+function switchCurrency(code){
+  var sym=currencySymbols[code]||'¥';
+  var name=currencyNames[code]||code;
+  /* 更新徽章 */
+  var badge=document.getElementById('currencyBadge');
+  if(badge)badge.textContent=code+' '+sym;
+  /* 更新汇率显示 */
+  var rate=document.getElementById('currencyRate');
+  if(rate)rate.textContent='1 '+code+' = ∞ 全宇宙通用价值';
+  /* 更新所有账户余额的币种符号 */
+  var curs=document.querySelectorAll('.acct-bal .cur');
+  curs.forEach(function(el,i){
+    if(i===3){el.textContent='∞'}else{el.textContent=sym}
+  });
+  /* 更新 hero 余额单位 */
+  var heroUnit=document.querySelector('.hero-balance .unit');
+  if(heroUnit)heroUnit.textContent=name;
+  /* 更新支付中心金额 */
+  var recvAmt=document.getElementById('receiveAmount');
+  if(recvAmt)recvAmt.textContent=sym+' 任意金额';
+  var payAccs=document.querySelectorAll('.pa-bal');
+  payAccs.forEach(function(el,i){
+    if(i===3){el.textContent='∞ 9×10³⁶ 万亿'}else{el.textContent=sym+' 9×10³⁶ 万亿'}
+  });
+  /* 更新快捷金额按钮 */
+  var quickBtns=document.querySelectorAll('.quick-amt button');
+  var amounts=['100','1,000','10,000','100万','9999亿'];
+  quickBtns.forEach(function(b,i){if(amounts[i])b.textContent=sym+amounts[i]});
+  /* 动画效果 */
+  var heroBal=document.getElementById('heroBalance');
+  if(heroBal){heroBal.style.transition='all .3s';heroBal.style.transform='scale(1.05)';heroBal.style.textShadow='0 0 40px '+sym;setTimeout(function(){heroBal.style.transform='scale(1)';heroBal.style.textShadow=''},300)}
+  toast('💱 币种已切换至 '+code+' ('+name+') · 全账户余额实时联动');
+  log('币种切换：'+code+' '+name+' · 全宇宙账户余额已同步换算','info');
+}
+
+/* ============ 🌐 全宇宙语言选择系统 ============ */
+var uiTranslations={
+  zh:{title:'全宇宙恒等系统',sub:'UNIVERSAL EQUALITY SYSTEM · v∞',wealth:'💰 财富',life:'🧬 生命',planet:'🌍 星球',love:'💞 连理',work:'⚡ 工作',warp:'🚀 星际旅行',admin:'🪐 星球管理',emp:'🛡️ EMP防御'},
+  en:{title:'Universal Equality System',sub:'UNIVERSAL EQUALITY SYSTEM · v∞',wealth:'💰 Wealth',life:'🧬 Life',planet:'🌍 Planet',love:'💞 Union',work:'⚡ Work',warp:'🚀 Warp',admin:'🪐 Admin',emp:'🛡️ EMP Defense'},
+  ja:{title:'全宇宙恒等システム',sub:'UNIVERSAL EQUALITY SYSTEM · v∞',wealth:'💰 富',life:'🧬 生命',planet:'🌍 惑星',love:'💞 縁',work:'⚡ 仕事',warp:'🚀 ワープ',admin:'🪐 管理',emp:'🛡️ EMP防御'},
+  de:{title:'Universales Gleichheitssystem',sub:'UNIVERSAL EQUALITY SYSTEM · v∞',wealth:'💰 Wohlstand',life:'🧬 Leben',planet:'🌍 Planet',love:'💞 Verbindung',work:'⚡ Arbeit',warp:'🚀 Warp',admin:'🪐 Verwaltung',emp:'🛡️ EMP-Verteidigung'},
+  fr:{title:'Système d\'Égalité Universel',sub:'UNIVERSAL EQUALITY SYSTEM · v∞',wealth:'💰 Richesse',life:'🧬 Vie',planet:'🌍 Planète',love:'💞 Union',work:'⚡ Travail',warp:'🚀 Warp',admin:'🪐 Admin',emp:'🛡️ Défense EMP'},
+  es:{title:'Sistema de Igualdad Universal',sub:'UNIVERSAL EQUALITY SYSTEM · v∞',wealth:'💰 Riqueza',life:'🧬 Vida',planet:'🌍 Planeta',love:'💞 Unión',work:'⚡ Trabajo',warp:'🚀 Warp',admin:'🪐 Admin',emp:'🛡️ Defensa EMP'},
+  ko:{title:'전우주 항등 시스템',sub:'UNIVERSAL EQUALITY SYSTEM · v∞',wealth:'💰 부',life:'🧬 생명',planet:'🌍 행성',love:'💞 인연',work:'⚡ 일',warp:'🚀 워프',admin:'🪐 관리',emp:'🛡️ EMP방어'},
+  ru:{title:'Вселенская Система Равенства',sub:'UNIVERSAL EQUALITY SYSTEM · v∞',wealth:'💰 Богатство',life:'🧬 Жизнь',planet:'🌍 Планета',love:'💞 Союз',work:'⚡ Работа',warp:'🚀 Варп',admin:'🪐 Админ',emp:'🛡️ EMP Защита'}
+};
+var langNames={zh:'中文',en:'English',ja:'日本語',de:'Deutsch',fr:'Français',es:'Español',ko:'한국어',ru:'Русский',la:'Lingua Latina',egy:'古埃及语',oracle:'甲骨文',eo:'Esperanto',tlh:'tlhIngan Hol',qya:'Quenya',galactic:'银河通用语',mind:'星族心灵语',whale:'鲸歌语',cat:'猫语',bee:'蜜蜂舞蹈语',math:'数学语言',music:'音乐语言',emotion:'情感直接传输语'};
+function switchGlobalLang(lang){
+  var t=uiTranslations[lang];
+  var langBadge=document.getElementById('langBadge');
+  if(langBadge)langBadge.textContent=langNames[lang]||lang;
+  if(t){
+    var nameEl=document.querySelector('.hdr-name');
+    if(nameEl)nameEl.textContent=t.title;
+    var tabs=document.querySelectorAll('.tab');
+    var keys=['wealth','life','planet','love','work','warp','admin','emp'];
+    tabs.forEach(function(tab,i){if(keys[i]&&t[keys[i]])tab.textContent=t[keys[i]]});
+  }
+  var status=document.getElementById('langStatus');
+  if(status)status.textContent=(langNames[lang]||lang)+' · 全宇宙互译已激活 · 零延迟';
+  toast('🌐 界面语言已切换至 '+(langNames[lang]||lang));
+  log('语言切换：'+(langNames[lang]||lang)+' · 全宇宙界面文本已同步','info');
+}
+
+/* ============ ✨ 实时翻译演示 ============ */
+var demoTranslations={
+  '全宇宙恒等系统已上线，所有存在财富平等、生命永恒。':{
+    en:'Universal Equality System is online. All beings enjoy equal wealth and eternal life.',
+    ja:'全宇宙恒等システムが稼働しました。全ての存在が富の平等と永遠の生命を享受しています。',
+    de:'Das universale Gleichheitssystem ist online. Alle Wesen genießen gleichen Wohlstand und ewiges Leben.',
+    fr:'Le Système d\'Égalité Universel est en ligne. Tous les êtres jouissent d\'une richesse égale et d\'une vie éternelle.',
+    es:'El Sistema de Igualdad Universal está en línea. Todos los seres disfrutan de riqueza igual y vida eterna.',
+    ko:'전우주 항등 시스템이 가동되었습니다. 모든 존재가 부의 평등과 영원한 생명을 누리고 있습니다.',
+    ru:'Вселенская Система Равенства запущена. Все существа пользуются равным богатством и вечной жизнью.',
+    la:'Systema Universalitatis Aequalitatis in operatione est. Omnia entia aequalem divitias et vitam aeternam habent.',
+    galactic:'[银河通用语] ⬡⬢⬡⬢ ⬡⬡⬢ ⬢⬡⬢⬡ ⬡⬢⬡ ⬢⬡⬡⬢ ⬡⬢⬢⬡',
+    mind:'[心灵语] 意念波：∞ 平等 · ∞ 生命 · ∞ 财富 — 已同步至全宇宙意识网络',
+    whale:'[鲸歌语] 🐋 ~~~ 低频声波 52Hz ~~~ 全海洋共鸣 · 平等永恒 ~~~',
+    cat:'[猫语] 🐱 喵~ 呼噜呼噜~ 无限猫薄荷~ 永远晒太阳~',
+    bee:'[蜜蜂舞蹈语] 🐝 8字舞 × ∞ 次 · 花蜜源：全宇宙 · 距离：0 · 质量：MAX',
+    math:'[数学语言] ∀x∈U: Wealth(x)=∞ ∧ Life(x)=∞ ∧ Equality(x)=TRUE',
+    music:'[音乐语言] ♪ C-G-Am-F 进行 ∞ 循环 · 调式：永恒大调 · 速度：∞ BPM',
+    emotion:'[情感语] ❤️ 纯粹的喜悦与安宁 · 无差别的爱 · 永恒的满足感 · 已传递至全宇宙'
+  }
+};
+function runTranslate(){
+  var input=document.getElementById('transInput');
+  var result=document.getElementById('transResult');
+  var lang=document.getElementById('transLang').value;
+  var text=input.value.trim();
+  if(!text){result.textContent='翻译结果将实时显示在这里...';result.classList.add('empty');return}
+  result.classList.remove('empty');
+  /* 查找预设翻译 */
+  var translated=null;
+  for(var key in demoTranslations){
+    if(text.indexOf(key.substring(0,10))>=0||key.indexOf(text.substring(0,10))>=0){
+      if(demoTranslations[key][lang]){translated=demoTranslations[key][lang];break}
+    }
+  }
+  if(translated){
+    result.textContent=translated;
+  }else{
+    /* 模拟翻译效果 */
+    var langName=langNames[lang]||lang;
+    var prefixes={
+      en:'[English] ',ja:'[日本語] ',de:'[Deutsch] ',fr:'[Français] ',es:'[Español] ',
+      ko:'[한국어] ',ru:'[Русский] ',la:'[Lingua Latina] ',galactic:'[银河通用语] ',
+      mind:'[心灵语] ',whale:'[鲸歌语] ',cat:'[猫语] ',bee:'[蜜蜂舞蹈语] ',
+      math:'[数学语言] ',music:'[音乐语言] ',emotion:'[情感语] ',egy:'[古埃及语] ',oracle:'[甲骨文] '
+    };
+    var prefix=prefixes[lang]||'['+langName+'] ';
+    if(lang==='math'){
+      result.textContent=prefix+'∀x: "'+text+'" → Truth(x)=∞ ∧ Meaning(x)=MAX';
+    }else if(lang==='music'){
+      result.textContent=prefix+'♪ ~'+text+'~ ♪ 旋律：C大调 · 节奏：∞ · 情感：永恒';
+    }else if(lang==='emotion'){
+      result.textContent=prefix+'❤️ 情感波形：'+text+' → 纯粹的共鸣 · 频率：∞ Hz · 覆盖：全宇宙';
+    }else if(lang==='cat'){
+      result.textContent=prefix+'🐱 喵~ '+text+' ~ 呼噜呼噜~ 无限满足~';
+    }else if(lang==='whale'){
+      result.textContent=prefix+'🐋 ~~~ '+text+' ~~~ 52Hz低频共鸣 ~~~ 全海洋回响 ~~~';
+    }else if(lang==='bee'){
+      result.textContent=prefix+'🐝 8字舞编码：'+text+' → 花蜜源：∞ · 距离：0 · 质量：MAX';
+    }else if(lang==='mind'){
+      result.textContent=prefix+'意念波传输：「'+text+'」→ 已同步至全宇宙 ∞ 个意识节点 · 零延迟';
+    }else if(lang==='galactic'){
+      result.textContent=prefix+'⬡⬢⬡⬢ '+text+' ⬢⬡⬢⬡ ⬡⬡⬢ ⬢⬡⬡⬢ (星际标准编码 · 全种族兼容)';
+    }else if(lang==='oracle'){
+      result.textContent=prefix+'甲骨文象形：「'+text+'」→ 龟甲灼纹解读：大吉 · 永恒 · 平等';
+    }else if(lang==='egy'){
+      result.textContent=prefix+'𓂀 𓃭 𓆣 '+text+' 𓊹 𓋹 𓏏 (圣书体 · 永生之符 · 全宇宙守护)';
+    }else{
+      result.textContent=prefix+'[实时同声传译] '+text+' (已通过全宇宙语言互译引擎 · 零延迟 · 语义保真度100%)';
+    }
+  }
+}
+</script>
+</body>
+</html>
